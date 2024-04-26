@@ -12,10 +12,15 @@
   > - 간단하지만 완성도있는 글쓰기에 재미를 느낍니다.
 
 - [x] 기본 버전 목업 디자인 완성  
-  <img width="700" alt="dailydirector" src="https://github.com/OhHaneol/jag3/assets/62991586/bed8d4ea-c277-47f8-b767-a0da94cbd020">
-  
-- [ ] 기능 리스트 및 ERD 완성
+  <img width="700" alt="dailydirector_white" src="https://github.com/OhHaneol/daily-director/assets/62991586/112d2890-9694-4508-b728-b22c9f9d8013">
 
+  - 사용 도구: [Figma](https://www.figma.com/)
+
+- [x] 기본 버전 기능 리스트 및 ERD 완성  
+  <img width="700" alt="dailydirector_erd_basic" src="https://github.com/OhHaneol/daily-director/assets/62991586/c3991db6-2d93-4653-8a5e-a1aea3cdcced">
+  
+  - 사용 도구: [erdcloud](https://www.erdcloud.com/)
+  
 ## 2주차(4/28~5/4)
 
 - [ ] 서버 배포
