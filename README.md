@@ -20,6 +20,14 @@
   <img width="700" alt="dailydirector_erd_basic" src="https://github.com/OhHaneol/daily-director/assets/62991586/c3991db6-2d93-4653-8a5e-a1aea3cdcced">
   
   - 사용 도구: [erdcloud](https://www.erdcloud.com/)
+
+- [x] 사용 skill
+  > Java 17
+  > Spring 3.2.5
+  > gradle
+  > MySQL
+  > JPARepository
+  > AWS + EC2
   
 ## 2주차(4/28~5/4)
 
