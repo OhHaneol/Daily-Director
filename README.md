@@ -22,12 +22,12 @@
   - 사용 도구: [erdcloud](https://www.erdcloud.com/)
 
 - [x] 사용 skill
-  > Java 17
-  > Spring 3.2.5
-  > gradle
-  > MySQL
-  > JPARepository
-  > AWS + EC2
+  > - Java 17  
+  > - Spring 3.2.5  
+  > - gradle  
+  > - MySQL  
+  > - JPARepository  
+  > - AWS + EC2  
   
 ## 2주차(4/28~5/4)
 
