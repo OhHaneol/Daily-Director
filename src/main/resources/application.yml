@@ -14,13 +14,13 @@ spring:
       matching-strategy: ant_path_matcher
 
   jpa:
-    properties:
-      hibernate:
-        ddl-auto: update
-        format_sql: true
-      dialect: org.hibernate.dialect.MySQL8InnoDBDialect
-    show-sql: true
     open-in-view: true
+    hibernate:
+      ddl-auto: update
+      format_sql: true
+    show-sql: true
+    properties:
+      dialect: org.hibernate.dialect.MySQL8InnoDBDialect
 #    database-platform: org.hibernate.dialect.MySQL8InnoDBDialect
 
 
