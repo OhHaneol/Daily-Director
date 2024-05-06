@@ -34,8 +34,10 @@ server:
     uri-encoding: UTF-8
   forward-headers-strategy: framework
 
-#  jwt:
-#    secret:
+jwt:
+  secret:
+    key: 47362e25dda1b5e90d840d741d8b59f573852175df08a8e7d1b8ce9a234ccfd8c6d1d72331eee73b6e429a6c987ef9529daa16696bdc9d6f2c7d429b73ff812a
+# TODO static 변수 등록 어디에 하나?
 
 logging:
   level:
