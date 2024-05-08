@@ -15,8 +15,16 @@ public class AuthService {
     private final TokenService tokenService;
 
     public AuthLoginResponse login(AuthLoginRequest request) {
-        var user = userRepository.findByEmailAndPassword(request.getEmail(), request.getPassword())
-                .orElseThrow(() -> new AuthLoginException(ErrorType.FAIL_TO_LOGIN_ERROR));
+//        var user = userRepository.findByEmailAndPassword(request.getEmail(), request.getPassword())
+//                .orElseThrow(() -> new AuthLoginException(ErrorType.FAIL_TO_LOGIN_ERROR));
+
+        var user = userRepository.findByEmail(request.getEmail())
+                .orElseThrow(() -> new AuthLoginException(ErrorType.USER_NOT_FOUND_ERROR));
+
+        if (!request.getPassword().equals(user.getPassword())) {
+            throw new AuthLoginException(ErrorType.INVALID_PASSWORD);
+        }
+
         var token = tokenService.jwtBuilder(user.getId(), user.getNickname());
 
         return new AuthLoginResponse(user.getNickname(), token);
