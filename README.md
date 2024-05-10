@@ -18,35 +18,35 @@
 
 - [x] 기본 버전 기능 리스트 및 ERD 완성  
   <img width="700" alt="dailydirector_erd_basic" src="https://github.com/OhHaneol/daily-director/assets/62991586/c3991db6-2d93-4653-8a5e-a1aea3cdcced">
-  
+
   - 사용 도구: [erdcloud](https://www.erdcloud.com/)
 
 - [x] 사용 skill
-  > - Java 17  
-  > - Spring 3.2.5  
-  > - gradle  
-  > - MySQL  
-  > - JPARepository  
-  > - AWS + EC2  
-  
-## 2-3주차(4/28~5/11)
+  > - Java 17
+  > - Spring 3.2.5
+  > - gradle
+  > - MySQL
+  > - JPARepository
+  > - AWS + EC2
 
-- [ ] 서버 배포
+## 2-3주차(4/28~5/11)
 
 - [X] 회원가입 및 로그인 api 완성
 
-- [ ] 글쓰기 api 완성
+- [X] createNote api 완성
 
-## 3주차(5/12~5/18)
+- [ ] updateNote, deleteNote api 완성
+
+- [ ] AuthUser 인가 적용
+
+- [ ] 서버 배포
+
+## 3-4주차(5/12~5/25)
 
 - [ ] 커뮤니티 버전 추가 기획
 
 - [ ] 커뮤니티 버전 목업 디자인 완성
 
 - [ ] 커뮤니티 버전 기능리스트 및 ERD 완성
-
-## 4주차(5/19~5/25)
-
-- [ ] api
 
 - [ ] api
