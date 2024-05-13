@@ -1,6 +1,7 @@
 package ohahsis.dailydirecter.note.presentaion;
 
 import lombok.RequiredArgsConstructor;
+import ohahsis.dailydirecter.auth.model.AuthUser;
 import ohahsis.dailydirecter.common.model.ResponseDto;
 import ohahsis.dailydirecter.note.application.NoteService;
 import ohahsis.dailydirecter.note.dto.request.NoteSaveRequest;
@@ -26,7 +27,7 @@ public class NoteController {
 //    }
 
     @PostMapping
-    public ResponseEntity<?> createNote(@RequestBody NoteSaveRequest noteRequest) {
+    public ResponseEntity<?> createNote(AuthUser user, @RequestBody NoteSaveRequest noteRequest) {
         var response = noteService.save(noteRequest);
         return ResponseDto.created(response);
     }

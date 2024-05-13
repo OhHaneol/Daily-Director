@@ -2,6 +2,7 @@ package ohahsis.dailydirecter.config.resolver;
 
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import ohahsis.dailydirecter.auth.application.TokenService;
 import ohahsis.dailydirecter.auth.model.AuthToken;
 import ohahsis.dailydirecter.auth.model.AuthUser;
@@ -14,6 +15,7 @@ import org.springframework.web.method.support.ModelAndViewContainer;
 
 import static ohahsis.dailydirecter.auth.AuthConstants.AUTH_TOKEN_HEADER_KEY;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class UserArgumentResolver implements HandlerMethodArgumentResolver {
@@ -34,17 +36,20 @@ public class UserArgumentResolver implements HandlerMethodArgumentResolver {
 
         var accessToken = httpServletRequest.getHeader(AUTH_TOKEN_HEADER_KEY);  // request 의 헤더에서 토큰을 꺼낸다.
 
+        log.info(httpServletRequest.getHeader(AUTH_TOKEN_HEADER_KEY));
+
         if (accessToken == null) {  // 헤더에서 토큰 받아오려 했더니 토큰이 없음, 로그인을 하면 무조건 토큰을 주는데, 토큰이 없다는 뜻은... 로그인을 하지 않았다?
             if (parameter.isOptional()) {   // 토큰을 아직 받지 않은 게 아니라 회원정보가 없다는 뜻인가? TODO isOptional() 이 뭐지?
                 return null;
             }
-            accessToken = "";
+            log.error("토큰 없음 2");
+            accessToken = "";   // TODO 왜 여기서 예외처리를 하지 않고 tokenService 의 verifyToken 메서드까지 넘기는거지?
         }
 
         var token = new AuthToken(accessToken);
 
-        // TODO 만약 request 의 헤더에 token 이 없어서 accessToken 이 null 이라 "" 을 넣은 경우, 밑에 tokenService 에서는 AuthUser 객체 반환이 되지 않는 건가?
-        //  그럼 이 resolver 는 null 을 반환하고, 그럼 controller 에서 예외가 발생하게 되나?
+        // (해결) request 의 헤더에 token 이 없어서 accessToken 이 null 이라 "" 을 넣은 경우, 밑에 tokenService 에서는 AuthUser 객체 반환이 되지 않는건가? -> yes
+        // 그럼 이 resolver 는 null 을 반환하고, 그럼 controller 에서 예외가 발생하게 되나? -> no, controller 에서 해당 resolver 로 가고, tokenService 의 getAuthUser 의 verifyToken 에서 예외 발생!
 
         return tokenService.getAuthUser(token);                     // 사용: token 을 통해 얻은 AuthUser 객체를 반환한다.
     }

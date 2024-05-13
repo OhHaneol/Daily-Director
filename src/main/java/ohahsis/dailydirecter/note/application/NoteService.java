@@ -1,6 +1,7 @@
 package ohahsis.dailydirecter.note.application;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import ohahsis.dailydirecter.note.domain.Hashtag;
 import ohahsis.dailydirecter.note.domain.Note;
 import ohahsis.dailydirecter.note.domain.NoteHashtag;
@@ -17,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import static ohahsis.dailydirecter.note.NoteConstants.CONTENTS_MAX_SIZE;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class NoteService {
@@ -46,8 +48,15 @@ public class NoteService {
                 .title(request.getTitle())
                 .build();
 
+        var savedNote = noteRepository.save(note);
+
+
         // 해시태그가 기존에 존재하지 않으면 저장
         // 추후 해시태그 패키지 분리?
+        // TODO request 에 해시태그 없는 경우 처리
+        /**
+         * 해시태그 저장
+         */
         for (String name : request.getHashtagNames()) {
             if(!hashtagRepository.existsByName(name)) {
                 var hashtag = Hashtag.builder()
@@ -56,7 +65,6 @@ public class NoteService {
                 hashtagRepository.save(hashtag);
             }
         }
-        var savedNote = noteRepository.save(note);
 
         /**
          * 노트 해시태그 저장
