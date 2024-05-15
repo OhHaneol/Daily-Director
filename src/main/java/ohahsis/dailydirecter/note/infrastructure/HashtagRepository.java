@@ -10,4 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 public interface HashtagRepository extends JpaRepository<Hashtag, Long> {
     @Transactional
     Boolean existsByName(String name);
+
+    Hashtag findByName(String name);
 }
