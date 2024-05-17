@@ -16,6 +16,8 @@ import org.springframework.stereotype.Component;
 
 import java.util.Date;
 
+import static ohahsis.dailydirecter.auth.AuthConstants.AUTH_TOKEN_HEADER_KEY;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -36,7 +38,7 @@ public class TokenService {
             if (e.getMessage().contains("JWT expired")) {   // TODO JWT expired 는 정의한 건지, 아니면 실제 error 메시지 내용에 포함되는지?
                 throw new AuthorizationException(ErrorType.AUTHORIZATION_ERROR);
             }
-            throw new AuthorizationException(ErrorType.AUTHORIZATION_ERROR);    // TODO 왜 if 안 밖 같은 에러를 중복으로 처리하지? 위에는 만료 에러, 이거는 토큰이 없는 경우의 에러인가?
+            throw new IllegalArgumentException(ErrorType.NULL_TOKEN.getMessage());  // IllegalArgumentException 은 parseClaimsJws 의 예외 처리
         }
 
         // TODO token 을 이용한 로그인의 경우 DB 조회를 줄이는 게 장점인데, 밑에서 userRepository 를 통해 DB 조회가 일어난다. 왜지?
