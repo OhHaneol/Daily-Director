@@ -29,19 +29,17 @@
   > - JPARepository
   > - AWS + EC2
 
-## 2-3주차(4/28~5/11)
+## 2-3주차(4/28~5/18)
 
 - [X] 회원가입 및 로그인 api 완성
 
-- [X] createNote api 완성
+- [X] note api 완성
 
-- [ ] updateNote, deleteNote api 완성
-
-- [ ] AuthUser 인가 적용
+- [X] AuthUser 인가 적용
 
 - [ ] 서버 배포
 
-## 3-4주차(5/12~5/25)
+## 3-4주차(5/19~5/25)
 
 - [ ] 커뮤니티 버전 추가 기획
 
