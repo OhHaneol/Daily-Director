@@ -6,15 +6,11 @@ import ohahsis.dailydirecter.auth.model.AuthUser;
 import ohahsis.dailydirecter.common.dto.SuccessResponse;
 import ohahsis.dailydirecter.exception.login.AuthLoginException;
 import ohahsis.dailydirecter.exception.note.NoteInvalidException;
-import ohahsis.dailydirecter.note.domain.Hashtag;
+import ohahsis.dailydirecter.hashtag.application.HashtagService;
 import ohahsis.dailydirecter.note.domain.Note;
-import ohahsis.dailydirecter.note.domain.NoteHashtag;
-import ohahsis.dailydirecter.note.dto.request.NoteEditRequest;
-import ohahsis.dailydirecter.note.dto.request.NoteSaveRequest;
+import ohahsis.dailydirecter.note.dto.request.NoteRequest;
 import ohahsis.dailydirecter.note.dto.response.NoteResponse;
 import ohahsis.dailydirecter.note.dto.response.NoteSaveResponse;
-import ohahsis.dailydirecter.note.infrastructure.HashtagRepository;
-import ohahsis.dailydirecter.note.infrastructure.NoteHashtagRepository;
 import ohahsis.dailydirecter.note.infrastructure.NoteRepository;
 import ohahsis.dailydirecter.exception.dto.ErrorType;
 import ohahsis.dailydirecter.user.domain.User;
@@ -31,12 +27,14 @@ import static ohahsis.dailydirecter.note.NoteConstants.CONTENTS_MAX_SIZE;
 @RequiredArgsConstructor
 public class NoteService {
     private final NoteRepository noteRepository;
-    private final NoteHashtagRepository noteHashtagRepository;
-    private final HashtagRepository hashtagRepository;
     private final UserRepository userRepository;
+    private final HashtagService hashtagService;
 
+    /**
+     * 노트 생성
+     */
     @Transactional
-    public NoteSaveResponse writeNote(AuthUser user, NoteSaveRequest request) {
+    public NoteSaveResponse writeNote(AuthUser user, NoteRequest request) {
 
         // 제목과 내용이 모두 없는 경우
         if (request.getContents().isEmpty() || request.getTitle().isBlank()) {
@@ -54,9 +52,7 @@ public class NoteService {
         );
 
 
-        /**
-         * 노트 저장
-         */
+        // 노트 저장
         var note = Note.builder()   // TODO 왜 builder 를 사용하는가?
                 .contents(request.getContents())
                 .status(request.getStatus())
@@ -66,36 +62,7 @@ public class NoteService {
 
         var savedNote = noteRepository.save(note);
 
-        List<NoteHashtag> savedNoteHashtags = new ArrayList<>();
-        List<String> savedNoteHashtagNames = new ArrayList<>();
-
-        /**
-         * 노트 해시태그 저장
-         * TODO 해시태그 패키지 분리, request 에 해시태그 없는 경우 처리
-         */
-        for (String name : request.getHashtagNames()) {
-            Hashtag hashtag;
-            if (!hashtagRepository.existsByName(name)) {    // 기존에 없던 hashtag 는 build
-                hashtag = Hashtag.builder()
-                        .name(name)
-                        .build();
-                hashtagRepository.save(hashtag);
-            } else {                                        // 존재하면 해당 해시태그를 가져옴.
-                hashtag = hashtagRepository.findByName(name);
-            }
-
-            var noteHashtag = NoteHashtag.builder() // noteHashtag 를 build
-                    .note(note)
-                    .hashtag(hashtag)
-                    .build();
-
-            savedNoteHashtags.add(noteHashtag);
-            savedNoteHashtagNames.add(noteHashtag.getHashtag().getName());
-
-            noteHashtagRepository.save(noteHashtag);
-        }
-
-        note.setNoteHashtags(savedNoteHashtags);
+        List<String> savedNoteHashtagNames = hashtagService.saveNoteHashtag(note, request);
 
         return new NoteSaveResponse(
                 savedNote.getNote_id(),
@@ -112,7 +79,7 @@ public class NoteService {
      * 문제 2: 임시로 막은 코드의 중복이 심하다. resolver 등으로 옮기자!
      */
     @Transactional
-    public NoteSaveResponse editNote(AuthUser user, Long note_id, NoteEditRequest request) {
+    public NoteSaveResponse editNote(AuthUser user, Long note_id, NoteRequest request) {
 
         Note findNote = noteRepository.findById(note_id).orElseThrow(
                 () -> new NoteInvalidException(ErrorType.NOTE_NOT_FOUND_ERROR)
@@ -127,38 +94,7 @@ public class NoteService {
         findNote.setStatus(request.getStatus());
         findNote.setContents(request.getContents());
 
-        List<NoteHashtag> savedNoteHashtags = new ArrayList<>();
-        List<String> savedNoteHashtagNames = new ArrayList<>();
-
-        /**
-         * 해시태그, 노트 해시태그 저장
-         */
-        // 해시태그 이름을 받아와서 Hashtag 객체를 build
-        // TODO (생성은 괜찮은데) 수정의 경우 탈락되는 해시태그, 노트 해시태그가 있을 수 있음. 해당 로직 적용하기
-        // 엔티티 내부 cnt 추가해서~ if(cnt < 1)
-        for (String name : request.getHashtagNames()) {
-            Hashtag hashtag;
-            if (!hashtagRepository.existsByName(name)) {    // 기존에 없던 hashtag 는 build
-                hashtag = Hashtag.builder()
-                        .name(name)
-                        .build();
-                hashtagRepository.save(hashtag);
-            } else {                                        // 존재하면 해당 해시태그를 가져옴.
-                hashtag = hashtagRepository.findByName(name);
-            }
-
-            var noteHashtag = NoteHashtag.builder() // noteHashtag 를 build
-                    .note(findNote)
-                    .hashtag(hashtag)
-                    .build();
-
-            savedNoteHashtags.add(noteHashtag);
-            savedNoteHashtagNames.add(noteHashtag.getHashtag().getName());
-
-            noteHashtagRepository.save(noteHashtag);
-        }
-
-        findNote.setNoteHashtags(savedNoteHashtags);
+        List<String> savedNoteHashtagNames = hashtagService.saveNoteHashtag(findNote, request);
 
         return new NoteSaveResponse(
                 findNote.getNote_id(),
@@ -185,12 +121,9 @@ public class NoteService {
             throw new AuthLoginException(ErrorType.AUTHORIZATION_ERROR);
         }
 
+        // 해시태그 이름 조회
         List<String> noteHashtagNames = new ArrayList<>();
-        for (NoteHashtag noteHashtag : findNote.getNoteHashtags()) {
-            noteHashtagNames.add(noteHashtag.getHashtag().getName());
-            log.info("=======" + noteHashtag.getHashtag().getName());
-        }
-
+        hashtagService.getHashtagNames(findNote, noteHashtagNames);
 
         return new NoteResponse(
                 findNote.getContents(),

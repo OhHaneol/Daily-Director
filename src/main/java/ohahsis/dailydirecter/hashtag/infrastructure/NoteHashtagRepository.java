@@ -1,6 +1,6 @@
-package ohahsis.dailydirecter.note.infrastructure;
+package ohahsis.dailydirecter.hashtag.infrastructure;
 
-import ohahsis.dailydirecter.note.domain.NoteHashtag;
+import ohahsis.dailydirecter.hashtag.domain.NoteHashtag;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;

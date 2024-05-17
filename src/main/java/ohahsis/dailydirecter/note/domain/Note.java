@@ -4,12 +4,11 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import ohahsis.dailydirecter.common.entity.BaseEntity;
+import ohahsis.dailydirecter.hashtag.domain.NoteHashtag;
 import ohahsis.dailydirecter.user.domain.User;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Getter @Setter
 @Entity

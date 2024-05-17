@@ -1,7 +1,8 @@
-package ohahsis.dailydirecter.note.domain;
+package ohahsis.dailydirecter.hashtag.domain;
 
 import jakarta.persistence.*;
 import lombok.*;
+import ohahsis.dailydirecter.note.domain.Note;
 
 @Getter
 @Entity

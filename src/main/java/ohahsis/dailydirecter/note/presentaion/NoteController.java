@@ -5,8 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import ohahsis.dailydirecter.auth.model.AuthUser;
 import ohahsis.dailydirecter.common.model.ResponseDto;
 import ohahsis.dailydirecter.note.application.NoteService;
-import ohahsis.dailydirecter.note.dto.request.NoteEditRequest;
-import ohahsis.dailydirecter.note.dto.request.NoteSaveRequest;
+import ohahsis.dailydirecter.note.dto.request.NoteRequest;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,8 +20,8 @@ public class NoteController {
     @PostMapping
     public ResponseEntity<?> createNote(
             AuthUser user,
-            @RequestBody NoteSaveRequest noteRequest) {
-        var response = noteService.writeNote(user, noteRequest);
+            @RequestBody NoteRequest request) {
+        var response = noteService.writeNote(user, request);
         return ResponseDto.created(response);
     }
 
@@ -39,7 +38,7 @@ public class NoteController {
     public ResponseEntity<?> updateNote(
             AuthUser user,
             @PathVariable(name = "id") Long id,
-            @RequestBody NoteEditRequest request
+            @RequestBody NoteRequest request
     ) {
         var response = noteService.editNote(user, id, request);
         return ResponseDto.ok(response);
