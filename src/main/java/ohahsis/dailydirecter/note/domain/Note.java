@@ -2,17 +2,16 @@ package ohahsis.dailydirecter.note.domain;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import ohahsis.dailydirecter.common.entity.BaseEntity;
 import ohahsis.dailydirecter.user.domain.User;
 
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
-@Data
+@Getter @Setter
 @Entity
 @Builder
 @NoArgsConstructor
@@ -33,12 +32,12 @@ public class Note extends BaseEntity {
     private Boolean status; // 노트 완결 여부
 
     @Size(max = 4)
-    private Set<String> contents = new HashSet<>();
+    private List<String> contents = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id")
     private User user;
 
     @OneToMany(mappedBy = "note", cascade = CascadeType.ALL)
-    private Set<NoteHashtag> noteHashtags = new HashSet<>();
+    private List<NoteHashtag> noteHashtags = new ArrayList<>();
 }

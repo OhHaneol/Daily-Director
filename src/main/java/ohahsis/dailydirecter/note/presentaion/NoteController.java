@@ -19,16 +19,20 @@ public class NoteController {
     private final NoteService noteService;
 
     @PostMapping
-    public ResponseEntity<?> createNote(AuthUser user, @RequestBody NoteSaveRequest noteRequest) {
-        var response = noteService.writeNote(noteRequest);
+    public ResponseEntity<?> createNote(
+            AuthUser user,
+            @RequestBody NoteSaveRequest noteRequest) {
+        var response = noteService.writeNote(user, noteRequest);
         return ResponseDto.created(response);
     }
 
-//    @GetMapping("/{id}")
-//    public ResponseEntity<?> getNote(AuthUser user, @PathVariable Long id) {
-//        var response = noteService.getNote(id);
-//        return ResponseDto.ok(response);
-//    }
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getNote(
+            AuthUser user,
+            @PathVariable(name = "id") Long id) {
+        var response = noteService.getNote(user, id);
+        return ResponseDto.ok(response);
+    }
 
 
     @PutMapping("/{id}")
@@ -37,15 +41,17 @@ public class NoteController {
             @PathVariable(name = "id") Long id,
             @RequestBody NoteEditRequest request
     ) {
-        var response = noteService.editNote(id, request);
+        var response = noteService.editNote(user, id, request);
         return ResponseDto.ok(response);
     }
 
-//    @DeleteMapping("/{id}")
-//    public ResponseEntity<?> deleteNote(AuthUser user, @PathVariable Long id) {
-//        var response = noteService.deleteNote(id);
-//        return ResponseDto.ok(response);
-//    }
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteNote(
+            AuthUser user,
+            @PathVariable(name = "id") Long id) {
+        var response = noteService.deleteNote(user, id);
+        return ResponseDto.ok(response);
+    }
 
 
     // TODO @RequestBody 두 개 적용하는 Service 를(ServiceImpl 이용해서) 따로 만들어보자.

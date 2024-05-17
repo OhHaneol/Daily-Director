@@ -2,23 +2,27 @@ package ohahsis.dailydirecter.note.application;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import ohahsis.dailydirecter.auth.model.AuthUser;
+import ohahsis.dailydirecter.common.dto.SuccessResponse;
+import ohahsis.dailydirecter.exception.login.AuthLoginException;
 import ohahsis.dailydirecter.exception.note.NoteInvalidException;
 import ohahsis.dailydirecter.note.domain.Hashtag;
 import ohahsis.dailydirecter.note.domain.Note;
 import ohahsis.dailydirecter.note.domain.NoteHashtag;
 import ohahsis.dailydirecter.note.dto.request.NoteEditRequest;
 import ohahsis.dailydirecter.note.dto.request.NoteSaveRequest;
+import ohahsis.dailydirecter.note.dto.response.NoteResponse;
 import ohahsis.dailydirecter.note.dto.response.NoteSaveResponse;
 import ohahsis.dailydirecter.note.infrastructure.HashtagRepository;
 import ohahsis.dailydirecter.note.infrastructure.NoteHashtagRepository;
 import ohahsis.dailydirecter.note.infrastructure.NoteRepository;
 import ohahsis.dailydirecter.exception.dto.ErrorType;
+import ohahsis.dailydirecter.user.domain.User;
+import ohahsis.dailydirecter.user.infrastructure.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashSet;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static ohahsis.dailydirecter.note.NoteConstants.CONTENTS_MAX_SIZE;
 
@@ -29,9 +33,11 @@ public class NoteService {
     private final NoteRepository noteRepository;
     private final NoteHashtagRepository noteHashtagRepository;
     private final HashtagRepository hashtagRepository;
+    private final UserRepository userRepository;
 
     @Transactional
-    public NoteSaveResponse writeNote(NoteSaveRequest request) {
+    public NoteSaveResponse writeNote(AuthUser user, NoteSaveRequest request) {
+
         // 제목과 내용이 모두 없는 경우
         if (request.getContents().isEmpty() || request.getTitle().isBlank()) {
             throw new NoteInvalidException(ErrorType.NOT_BLANK_ERROR);
@@ -42,6 +48,11 @@ public class NoteService {
             throw new NoteInvalidException(ErrorType.CONTENTS_MAX_SIZE_4);
         }
 
+        // 노트 작성자
+        User noteUser = userRepository.findById(user.getId()).orElseThrow(  // TODO 해당 컨트롤러에 Auth 접근으로써 user 는 이미 확인되었는데, null 일 경우를 꼭 대비해야만 하나?
+                () -> new AuthLoginException(ErrorType.AUTHORIZATION_ERROR)
+        );
+
 
         /**
          * 노트 저장
@@ -50,30 +61,19 @@ public class NoteService {
                 .contents(request.getContents())
                 .status(request.getStatus())
                 .title(request.getTitle())
+                .user(noteUser)
                 .build();
 
         var savedNote = noteRepository.save(note);
 
-
-        // 해시태그가 기존에 존재하지 않으면 저장
-        // TODO 해시태그 패키지 분리, request 에 해시태그 없는 경우 처리
-//        /**
-//         * 해시태그 저장
-//         */
-//        for (String name : request.getHashtagNames()) {
-//            if(!hashtagRepository.existsByName(name)) {
-//                var hashtag = Hashtag.builder()
-//                        .name(name)
-//                        .build();
-//                hashtagRepository.save(hashtag);
-//            }
-//        }
+        List<NoteHashtag> savedNoteHashtags = new ArrayList<>();
+        List<String> savedNoteHashtagNames = new ArrayList<>();
 
         /**
          * 노트 해시태그 저장
+         * TODO 해시태그 패키지 분리, request 에 해시태그 없는 경우 처리
          */
-        // 해시태그 이름을 받아와서 Hashtag 객체를 build
-        for (String name : request.getHashtagNames()) {     // TODO 해시태그랑 중복 -> 메서드만 빼내서 해결하는지, 아님 해시태그 테이블 분리 시 해결되는지.
+        for (String name : request.getHashtagNames()) {
             Hashtag hashtag;
             if (!hashtagRepository.existsByName(name)) {    // 기존에 없던 hashtag 는 build
                 hashtag = Hashtag.builder()
@@ -83,34 +83,52 @@ public class NoteService {
             } else {                                        // 존재하면 해당 해시태그를 가져옴.
                 hashtag = hashtagRepository.findByName(name);
             }
+
             var noteHashtag = NoteHashtag.builder() // noteHashtag 를 build
                     .note(note)
                     .hashtag(hashtag)
                     .build();
+
+            savedNoteHashtags.add(noteHashtag);
+            savedNoteHashtagNames.add(noteHashtag.getHashtag().getName());
+
             noteHashtagRepository.save(noteHashtag);
         }
-        return new NoteSaveResponse(savedNote.getNote_id());
+
+        note.setNoteHashtags(savedNoteHashtags);
+
+        return new NoteSaveResponse(
+                savedNote.getNote_id(),
+                savedNote.getContents(),
+                savedNote.getStatus(),
+                savedNote.getTitle(),
+                savedNoteHashtagNames,
+                savedNote.getUser().getId());
     }
 
     /**
-     * 노트 하나 읽기
-     */
-//    public Long getNote(Long note_id) {
-//
-//    }
-
-    /**
      * 노트 수정
+     * (해결?) 문제 1: 노트 작성자 이외의 사람도 노트에 대한 접근 및 수정이 가능함. -> 임시로 id 비교해서 막았는데, 이거면 충분할까? resolver 에서 token 으로 해야 하는 것?
+     * 문제 2: 임시로 막은 코드의 중복이 심하다. resolver 등으로 옮기자!
      */
     @Transactional
-    public Long editNote(Long note_id, NoteEditRequest request) {
+    public NoteSaveResponse editNote(AuthUser user, Long note_id, NoteEditRequest request) {
 
         Note findNote = noteRepository.findById(note_id).orElseThrow(
                 () -> new NoteInvalidException(ErrorType.NOTE_NOT_FOUND_ERROR)
         );
+
+        // 작성자인지 확인
+        if(!findNote.getUser().getId().equals(user.getId())) {
+            throw new AuthLoginException(ErrorType.AUTHORIZATION_ERROR);
+        }
+
         findNote.setTitle(request.getTitle());
         findNote.setStatus(request.getStatus());
         findNote.setContents(request.getContents());
+
+        List<NoteHashtag> savedNoteHashtags = new ArrayList<>();
+        List<String> savedNoteHashtagNames = new ArrayList<>();
 
         /**
          * 해시태그, 노트 해시태그 저장
@@ -128,20 +146,80 @@ public class NoteService {
             } else {                                        // 존재하면 해당 해시태그를 가져옴.
                 hashtag = hashtagRepository.findByName(name);
             }
+
             var noteHashtag = NoteHashtag.builder() // noteHashtag 를 build
                     .note(findNote)
                     .hashtag(hashtag)
                     .build();
+
+            savedNoteHashtags.add(noteHashtag);
+            savedNoteHashtagNames.add(noteHashtag.getHashtag().getName());
+
             noteHashtagRepository.save(noteHashtag);
         }
 
-        return findNote.getNote_id();
+        findNote.setNoteHashtags(savedNoteHashtags);
+
+        return new NoteSaveResponse(
+                findNote.getNote_id(),
+                findNote.getContents(),
+                findNote.getStatus(),
+                findNote.getTitle(),
+                savedNoteHashtagNames,
+                user.getId()
+        );
+    }
+
+    /**
+     * 노트 하나 읽기
+     * (해결) 문제 1: 해시태그를 response 에 보냈는데 보이지 않음. 수정 메서드에서도 마찬가지. -> note 에 같이 설정을 해줘야 함.
+     */
+    @Transactional(readOnly = true)
+    public NoteResponse getNote(AuthUser user, Long note_id) {
+        Note findNote = noteRepository.findById(note_id).orElseThrow(
+                () -> new NoteInvalidException(ErrorType.NOTE_NOT_FOUND_ERROR)
+        );
+
+        // 작성자인지 확인
+        if(!findNote.getUser().getId().equals(user.getId())) {
+            throw new AuthLoginException(ErrorType.AUTHORIZATION_ERROR);
+        }
+
+        List<String> noteHashtagNames = new ArrayList<>();
+        for (NoteHashtag noteHashtag : findNote.getNoteHashtags()) {
+            noteHashtagNames.add(noteHashtag.getHashtag().getName());
+            log.info("=======" + noteHashtag.getHashtag().getName());
+        }
+
+
+        return new NoteResponse(
+                findNote.getContents(),
+                findNote.getStatus(),
+                findNote.getTitle(),
+                noteHashtagNames);
+
     }
 
     /**
      * 노트 삭제
+     * (해결) 문제 1: 영속성 때문인지 deleteById 가 실행되지 않고 있음 -> 영속성... 때문은 아닌 것 같고, 노트와 해시태그를 잘 저장해준 뒤 실행하니 정상 삭제가 되었음.
+     * (해결) 문제 2: Note.getUser() 가 null 이 나옴. 맵핑 하면 자연스럽게 해당 로그인으로 수행되는 게 아니었음 -> createNote 에 추가.
      */
-//    public Long deleteNote(Long note_id) {
-//
-//    }
+    @Transactional
+    public SuccessResponse deleteNote(AuthUser user, Long note_id) {
+        Note findNote = noteRepository.findById(note_id).orElseThrow(
+                () -> new NoteInvalidException(ErrorType.NOTE_NOT_FOUND_ERROR)
+        );
+
+        // 작성자인지 확인
+        if(!findNote.getUser().getId().equals(user.getId())) {
+            throw new AuthLoginException(ErrorType.AUTHORIZATION_ERROR);
+        }
+
+        noteRepository.deleteById(note_id);
+//        noteRepository.delete(findNote); // entity 로 삭제하는 건 튜플이 아니라 해당 테이블 전체가 삭제되었음. ???
+
+        return new SuccessResponse("성공적으로 삭제되었습니다.");
+
+    }
 }
