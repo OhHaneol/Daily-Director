@@ -51,7 +51,6 @@ public class NoteService {
                 () -> new AuthLoginException(ErrorType.AUTHORIZATION_ERROR)
         );
 
-
         // 노트 저장
         var note = Note.builder()   // TODO 왜 builder 를 사용하는가?
                 .contents(request.getContents())
@@ -85,10 +84,7 @@ public class NoteService {
                 () -> new NoteInvalidException(ErrorType.NOTE_NOT_FOUND_ERROR)
         );
 
-        // 작성자인지 확인
-        if(!findNote.getUser().getId().equals(user.getId())) {
-            throw new AuthLoginException(ErrorType.AUTHORIZATION_ERROR);
-        }
+        isWriter(user, findNote);
 
         findNote.setTitle(request.getTitle());
         findNote.setStatus(request.getStatus());
@@ -117,9 +113,7 @@ public class NoteService {
         );
 
         // 작성자인지 확인
-        if(!findNote.getUser().getId().equals(user.getId())) {
-            throw new AuthLoginException(ErrorType.AUTHORIZATION_ERROR);
-        }
+        isWriter(user, findNote);
 
         // 해시태그 이름 조회
         List<String> noteHashtagNames = new ArrayList<>();
@@ -145,14 +139,20 @@ public class NoteService {
         );
 
         // 작성자인지 확인
-        if(!findNote.getUser().getId().equals(user.getId())) {
-            throw new AuthLoginException(ErrorType.AUTHORIZATION_ERROR);
-        }
+        isWriter(user, findNote);
 
         noteRepository.deleteById(note_id);
 //        noteRepository.delete(findNote); // entity 로 삭제하는 건 튜플이 아니라 해당 테이블 전체가 삭제되었음. ???
 
         return new SuccessResponse("성공적으로 삭제되었습니다.");
+    }
 
+    /**
+     * note_id argument 를 이용한 외부인 접근 제한 메서드
+     */
+    private void isWriter(AuthUser user, Note findNote) {
+        if(!findNote.getUser().getId().equals(user.getId())) {
+            throw new AuthLoginException(ErrorType.AUTHORIZATION_ERROR);
+        }
     }
 }
