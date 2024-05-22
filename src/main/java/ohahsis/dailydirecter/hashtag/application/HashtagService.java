@@ -1,6 +1,7 @@
 package ohahsis.dailydirecter.hashtag.application;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import ohahsis.dailydirecter.hashtag.domain.Hashtag;
 import ohahsis.dailydirecter.note.domain.Note;
 import ohahsis.dailydirecter.hashtag.domain.NoteHashtag;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class HashtagService {
@@ -28,7 +30,7 @@ public class HashtagService {
 
         /**
          * 노트 해시태그 저장
-         * TODO request 에 해시태그 없는 경우 처리
+         * TODO request 에 해시태그 없는 경우 처리(다른 것들도... nullable)
          */
         for (String name : request.getHashtagNames()) {
             Hashtag hashtag;
@@ -66,4 +68,9 @@ public class HashtagService {
         }
 
     }
+
+    /**
+     * TODO Hashtag 엔터티 관련 개수 관리
+     */
+
 }

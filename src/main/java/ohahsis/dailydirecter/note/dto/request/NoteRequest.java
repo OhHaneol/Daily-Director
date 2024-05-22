@@ -2,6 +2,7 @@ package ohahsis.dailydirecter.note.dto.request;
 
 import lombok.Data;
 
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -15,5 +16,5 @@ public class NoteRequest {
 
     private String title;
 
-    private Set<String> hashtagNames;
+    private LinkedHashSet<String> hashtagNames;
 }
