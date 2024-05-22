@@ -2,6 +2,8 @@ package ohahsis.dailydirecter.hashtag.application;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import ohahsis.dailydirecter.exception.dto.ErrorType;
+import ohahsis.dailydirecter.exception.note.NoteInvalidException;
 import ohahsis.dailydirecter.hashtag.domain.Hashtag;
 import ohahsis.dailydirecter.note.domain.Note;
 import ohahsis.dailydirecter.hashtag.domain.NoteHashtag;
@@ -12,6 +14,8 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static ohahsis.dailydirecter.note.NoteConstants.HASHTAGS_MAX_SIZE;
 
 @Slf4j
 @Service
@@ -27,6 +31,11 @@ public class HashtagService {
     public List<String> saveNoteHashtag(Note note, NoteRequest request) {
         List<NoteHashtag> savedNoteHashtags = new ArrayList<>();
         List<String> savedNoteHashtagNames = new ArrayList<>();
+
+        // 해시태그 개수가 3개를 초과할 경우
+        if (request.getHashtagNames().size() > HASHTAGS_MAX_SIZE) {
+            throw new NoteInvalidException(ErrorType.HASHTAGS_MAX_SIZE_3);
+        }
 
         /**
          * 노트 해시태그 저장
@@ -68,9 +77,5 @@ public class HashtagService {
         }
 
     }
-
-    /**
-     * TODO Hashtag 엔터티 관련 개수 관리
-     */
 
 }
