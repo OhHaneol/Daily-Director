@@ -32,14 +32,13 @@ public class HashtagService {
         List<NoteHashtag> savedNoteHashtags = new ArrayList<>();
         List<String> savedNoteHashtagNames = new ArrayList<>();
 
-        // 해시태그 개수가 3개를 초과할 경우
+        // 해시태그가 전달되지 않았거나, 개수가 3개를 초과할 경우
         if (request.getHashtagNames().size() > HASHTAGS_MAX_SIZE) {
             throw new NoteInvalidException(ErrorType.HASHTAGS_MAX_SIZE_3);
         }
 
         /**
          * 노트 해시태그 저장
-         * TODO request 에 해시태그 없는 경우 처리(다른 것들도... nullable)
          */
         for (String name : request.getHashtagNames()) {
             Hashtag hashtag;
@@ -75,7 +74,6 @@ public class HashtagService {
         for (NoteHashtag noteHashtag : note.getNoteHashtags()) {
             noteHashtagNames.add(noteHashtag.getHashtag().getName());
         }
-
     }
 
 }

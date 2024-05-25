@@ -37,7 +37,7 @@ public class NoteService {
     public NoteSaveResponse writeNote(AuthUser user, NoteRequest request) {
 
         // 제목과 내용이 모두 없는 경우
-        if (request.getContents().isEmpty() || request.getTitle().isBlank()) {
+        if (request.getContents().isEmpty() && request.getTitle().isBlank()) {
             throw new NoteInvalidException(ErrorType.NOT_BLANK_ERROR);
         }
 
@@ -53,7 +53,7 @@ public class NoteService {
 
 
         // 노트 저장
-        var note = Note.builder()   // TODO 왜 builder 를 사용하는가?
+        var note = Note.builder()   // 왜 builder 를 사용하는가? -> setter 는 어디서나 값을 수정할 수 있어서 객체지향적으로 좋지 못하다.
                 .contents(request.getContents())
                 .status(request.getStatus())
                 .title(request.getTitle())
