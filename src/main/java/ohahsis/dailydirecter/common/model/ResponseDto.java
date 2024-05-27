@@ -4,7 +4,6 @@ import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import ohahsis.dailydirecter.auth.dto.response.AuthLoginResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -12,11 +11,11 @@ import java.io.Serializable;
 
 @Data
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PROTECTED)  // TODO 뭐를 의미?
-public class ResponseDto<T> implements Serializable {   // TODO T 가 뭐지?
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class ResponseDto<T> implements Serializable {
     private T data;
 
-    public static <T> ResponseEntity<ResponseDto<T>> ok(T data) {   // TODO 반환값이 뭐지?
+    public static <T> ResponseEntity<ResponseDto<T>> ok(T data) {
         return ResponseEntity.ok(new ResponseDto<T>(data));
     }
 

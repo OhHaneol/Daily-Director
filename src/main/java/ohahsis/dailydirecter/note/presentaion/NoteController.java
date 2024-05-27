@@ -1,9 +1,11 @@
 package ohahsis.dailydirecter.note.presentaion;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ohahsis.dailydirecter.auth.model.AuthUser;
 import ohahsis.dailydirecter.common.model.ResponseDto;
+import ohahsis.dailydirecter.exception.dto.ErrorType;
 import ohahsis.dailydirecter.note.application.NoteService;
 import ohahsis.dailydirecter.note.dto.request.NoteRequest;
 import org.springframework.http.MediaType;
@@ -20,7 +22,7 @@ public class NoteController {
     @PostMapping
     public ResponseEntity<?> createNote(
             AuthUser user,
-            @RequestBody NoteRequest request) {
+            @RequestBody @Valid NoteRequest request) {
         var response = noteService.writeNote(user, request);
         return ResponseDto.created(response);
     }
@@ -38,7 +40,7 @@ public class NoteController {
     public ResponseEntity<?> updateNote(
             AuthUser user,
             @PathVariable(name = "id") Long id,
-            @RequestBody NoteRequest request
+            @Valid @RequestBody NoteRequest request
     ) {
         var response = noteService.editNote(user, id, request);
         return ResponseDto.ok(response);
