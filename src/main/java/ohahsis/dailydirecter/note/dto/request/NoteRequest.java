@@ -1,9 +1,9 @@
 package ohahsis.dailydirecter.note.dto.request;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
-import lombok.NonNull;
 import org.springframework.lang.Nullable;
 
 import java.util.LinkedHashSet;
@@ -21,6 +21,7 @@ public class NoteRequest {
     @Nullable
     private String title;
 
+    @NotNull(message = "해시태그 목록은 null 일 수 없습니다.")
     @Size(max = 3, message = "해시태그는 최대 3개까지 등록이 가능합니다.")
     private LinkedHashSet<String> hashtagNames;
 }
