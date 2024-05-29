@@ -31,6 +31,7 @@ public class Note extends BaseEntity {
     private Boolean status; // 노트 완결 여부
 
     @Size(max = 4)
+    @ElementCollection
     private List<String> contents = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
