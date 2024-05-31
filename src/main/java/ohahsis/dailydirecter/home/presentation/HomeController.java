@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping(path = "/api/main", produces = MediaType.APPLICATION_JSON_VALUE)
+@RequestMapping(path = "/api/home", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 public class HomeController {
     private final SearchService searchService;
@@ -24,23 +24,17 @@ public class HomeController {
     //      -> JPA find 메서드에 User 조건을 추가해서 해결!
 
     /**
-     * 노트 검색
+     * 노트 검색 - 키워드
      */
     @GetMapping("/search")
-    public ResponseEntity<?> searchNote(
+    public ResponseEntity<?> searchKeyword(
             AuthUser user,
-            @RequestBody @Valid SearchRequest request
-    ) {
-        var response = searchService.searchNote(user, request);
+            @RequestBody @Valid SearchRequest request) {
+        var response = searchService.searchKeyword(user, request);
         return ResponseDto.ok(response);
     }
 
-
-    /**
-     * (미)완성 버튼에 따른 노트 목록
-     */
-
-
+    /** (미)완성 버튼에 따른 노트 목록 */
 
     // TODO 회원 정보, 새로운 노트 추가 버튼 관련해서 어떤 게 필요한지 조사
 }

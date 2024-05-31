@@ -4,8 +4,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import ohahsis.dailydirecter.auth.model.AuthUser;
 import ohahsis.dailydirecter.exception.dto.ErrorType;
-import ohahsis.dailydirecter.exception.note.NoteInvalidException;
 import ohahsis.dailydirecter.exception.user.UserSignInvalidException;
+import ohahsis.dailydirecter.hashtag.application.HashtagService;
 import ohahsis.dailydirecter.home.dto.request.SearchRequest;
 import ohahsis.dailydirecter.home.dto.response.SearchResponse;
 import ohahsis.dailydirecter.note.domain.Note;
@@ -24,20 +24,24 @@ import java.util.List;
 public class SearchService {
     private final NoteRepository noteRepository;
     private final UserRepository userRepository;
+    private final HashtagService hashtagService;
 
     /**
      * 노트 검색 - 키워드로 조회
+     * TODO 추후 노트가 많아지면 지나치게 많은 데이터를 보내야 함. 모든 노트를 반환하지 않고 스크롤에 따른 요청에 맞게 n개를 반환하도록.
      */
     @Transactional(readOnly = true)
-    public List<SearchResponse> searchNote(AuthUser user, SearchRequest request) {
+    public List<SearchResponse> searchKeyword(
+            AuthUser user,
+            SearchRequest request) {
 
         String searchKeyword = request.getSearchKeyword();
-        List<String> findNotes = new ArrayList<>();
 
-        User findUser = userRepository.findById(user.getId()).orElseThrow(
-                () -> new UserSignInvalidException(
-                        ErrorType.USER_NOT_FOUND_ERROR
-                ));
+        User findUser = userRepository
+                .findById(user.getId())
+                .orElseThrow(
+                        () -> new UserSignInvalidException(
+                                ErrorType.USER_NOT_FOUND_ERROR));
 
         List<SearchResponse> searchResponseList = new ArrayList<>();
 
@@ -46,15 +50,9 @@ public class SearchService {
                 .findByUser_IdAndTitleContaining(
                         findUser.getId(),
                         searchKeyword);
-        notesByTitle.stream()
-                .forEach(
-                        note -> searchResponseList.add(
-                                new SearchResponse(
-                                        note.getNote_id(),
-                                        "byTitle",
-                                        note.getTitle()
-                                )
-                        ));
+
+        addResponse(notesByTitle, searchResponseList, "byTitle");
+
 
         // 내용이 해당 키워드를 포함하고 있을 경우
         // TODO 콘텐츠에서의 검색이 잘 이루어지지 않는 문제 해결하기
@@ -62,30 +60,36 @@ public class SearchService {
                 .findByUser_IdAndContentsContaining(
                         findUser.getId(),
                         searchKeyword);
-        notesByContent.stream()
-                .forEach(
-                        note -> searchResponseList.add(
-                                new SearchResponse(
-                                        note.getNote_id(),
-                                        "byContent",
-                                        note.getContents()
-                                                .stream()
-                                                .findFirst()
-                                                .filter(
-                                                        content ->
-                                                                content.contains(searchKeyword))
-                                                .orElseThrow(
-                                                        () -> new NoteInvalidException(ErrorType.NOTE_NOT_FOUND_ERROR))
-                                )
-                        ));
 
+        addResponse(notesByContent, searchResponseList, "byContent");
+
+
+        // 해시태그가 해당 키워드를 포함하고 있을 경우
+        List<Long> noteIds = new ArrayList<>();
+        hashtagService.getNoteByName(searchKeyword, noteIds);
+        List<Note> notesByHashtag = new ArrayList<>();
+
+        for (Long nId : noteIds) {
+            notesByHashtag.add(
+                    noteRepository
+                            .findByUser_IdAndNoteId(
+                                    findUser.getId(),
+                                    nId));
+        }
+
+        addResponse(notesByHashtag, searchResponseList, "byHashtag");
 
         return searchResponseList;
     }
 
+    private void addResponse(List<Note> notes, List<SearchResponse> searchResponseList, String keywordType) {
+        notes.stream()
+                .forEach(note -> searchResponseList.add(
+                        new SearchResponse(
+                                note.getNoteId(),
+                                keywordType,
+                                note.getTitle(),
+                                note.getContents())));
+    }
 
-
-    /**
-     * 노트 검색 - 해시태그로 조회
-     */
 }

@@ -10,6 +10,7 @@ import ohahsis.dailydirecter.hashtag.domain.NoteHashtag;
 import ohahsis.dailydirecter.note.dto.request.NoteRequest;
 import ohahsis.dailydirecter.hashtag.infrastructure.HashtagRepository;
 import ohahsis.dailydirecter.hashtag.infrastructure.NoteHashtagRepository;
+import ohahsis.dailydirecter.note.infrastructure.NoteRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -29,51 +30,66 @@ public class HashtagService {
      * NoteHashtag, Hashtag 저장
      */
     public List<String> saveNoteHashtag(Note note, NoteRequest request) {
-        List<NoteHashtag> savedNoteHashtags = new ArrayList<>();
+//        List<NoteHashtag> savedNoteHashtags = new ArrayList<>();
         List<String> savedNoteHashtagNames = new ArrayList<>();
 
         // 해시태그가 전달되지 않았거나, 개수가 3개를 초과할 경우
         if (request.getHashtagNames().size() > HASHTAGS_MAX_SIZE) {
-            throw new NoteInvalidException(ErrorType.HASHTAGS_MAX_SIZE_3);
+            throw new NoteInvalidException(
+                    ErrorType.HASHTAGS_MAX_SIZE_3);
         }
 
-        /**
-         * 노트 해시태그 저장
-         */
+        // 노트 해시태그 저장
         for (String name : request.getHashtagNames()) {
             Hashtag hashtag;
-            if (!hashtagRepository.existsByName(name)) {    // 기존에 없던 hashtag 는 build
+
+            // 기존에 없던 hashtag 는 build
+            if (!hashtagRepository.existsByName(name)) {
                 hashtag = Hashtag.builder()
                         .name(name)
                         .build();
                 hashtagRepository.save(hashtag);
-            } else {                                        // 존재하면 해당 해시태그를 가져옴.
+            } else {    // 존재하면 해당 해시태그를 가져옴.
                 hashtag = hashtagRepository.findByName(name);
             }
 
-            var noteHashtag = NoteHashtag.builder() // noteHashtag 를 build
+            // noteHashtag 를 build
+            var noteHashtag = NoteHashtag.builder()
                     .note(note)
                     .hashtag(hashtag)
                     .build();
 
-            savedNoteHashtags.add(noteHashtag);
+//            savedNoteHashtags.add(noteHashtag);
             savedNoteHashtagNames.add(noteHashtag.getHashtag().getName());
 
             noteHashtagRepository.save(noteHashtag);
         }
-        note.setNoteHashtags(savedNoteHashtags);
+//        note.setNoteHashtags(savedNoteHashtags);
 
         return savedNoteHashtagNames;
     }
 
     /**
-     * Hashtag 이름 출력
+     * Note 로 Hashtag 이름 출력
      */
     public void getHashtagNames(Note note, List<String> noteHashtagNames) {
 
         for (NoteHashtag noteHashtag : note.getNoteHashtags()) {
             noteHashtagNames.add(noteHashtag.getHashtag().getName());
         }
+    }
+
+    /**
+     * 키워드로 NoteHashtag 조회
+     */
+    public void getNoteByName(String noteHashtagName, List<Long> findNoteIds) {
+        List<NoteHashtag> noteHashtags = noteHashtagRepository
+                .findByHashtag_NameContaining(noteHashtagName);
+
+        noteHashtags.stream().forEach(
+                noteHashtag -> findNoteIds.add(noteHashtag
+                        .getNote()
+                        .getNoteId()));
     }
 
 }
