@@ -24,14 +24,15 @@ public class Note extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long note_id;
+    @Column(name = "note_id")
+    private Long noteId;    // 필드명에 언더바는 되도록 피하자. jpa 메서드에서 문제가 생긴다.
 
     private String title;
 
     private Boolean status; // 노트 완결 여부
 
     @Size(max = 4)
-    @ElementCollection
+    @ElementCollection  // 컬렉션 객체임을 jpa 에 알려주는 어노테이션
     private List<String> contents = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)

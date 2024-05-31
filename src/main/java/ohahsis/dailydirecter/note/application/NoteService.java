@@ -62,10 +62,11 @@ public class NoteService {
 
         var savedNote = noteRepository.save(note);
 
+        // TODO Service call Service 해결
         List<String> savedNoteHashtagNames = hashtagService.saveNoteHashtag(note, request);
 
         return new NoteSaveResponse(
-                savedNote.getNote_id(),
+                savedNote.getNoteId(),
                 savedNote.getContents(),
                 savedNote.getStatus(),
                 savedNote.getTitle(),
@@ -97,7 +98,7 @@ public class NoteService {
         List<String> savedNoteHashtagNames = hashtagService.saveNoteHashtag(findNote, request);
 
         return new NoteSaveResponse(
-                findNote.getNote_id(),
+                findNote.getNoteId(),
                 findNote.getContents(),
                 findNote.getStatus(),
                 findNote.getTitle(),
@@ -123,6 +124,7 @@ public class NoteService {
 
         // 해시태그 이름 조회
         List<String> noteHashtagNames = new ArrayList<>();
+        // TODO Service call Service
         hashtagService.getHashtagNames(findNote, noteHashtagNames);
 
         return new NoteResponse(
