@@ -19,4 +19,6 @@ public interface NoteRepository extends JpaRepository<Note, Long> {
     List<Note> findByUser_IdAndContentsContaining(Long userId, String keyword);
 
     Note findByUser_IdAndNoteId(Long userId, Long noteId);
+
+    List<Note> findByUser_IdAndStatus(Long userId, Boolean status);
 }
