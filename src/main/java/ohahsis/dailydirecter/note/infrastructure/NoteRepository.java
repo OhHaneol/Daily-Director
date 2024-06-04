@@ -15,7 +15,6 @@ public interface NoteRepository extends JpaRepository<Note, Long> {
 
     List<Note> findByUser_IdAndTitleContaining(Long userId, String keyword);
 
-    // TODO List<String> 형식의 데이터에서 조건 적용이 잘 되지 않고 있음. 해결하기.
     List<Note> findByUser_IdAndContentsContaining(Long userId, String keyword);
 
     Note findByUser_IdAndNoteId(Long userId, Long noteId);

@@ -62,7 +62,7 @@ public class NoteService {
 
         var savedNote = noteRepository.save(note);
 
-        // TODO Service call Service 해결
+        // TODO Service call Service
         List<String> savedNoteHashtagNames = hashtagService.saveNoteHashtag(note, request);
 
         return new NoteSaveResponse(
@@ -86,10 +86,7 @@ public class NoteService {
                 () -> new NoteInvalidException(ErrorType.NOTE_NOT_FOUND_ERROR)
         );
 
-        // 작성자인지 확인
-        if(!findNote.getUser().getId().equals(user.getId())) {
-            throw new AuthLoginException(ErrorType.AUTHORIZATION_ERROR);
-        }
+        isAuthor(user, findNote);
 
         findNote.setTitle(request.getTitle());
         findNote.setStatus(request.getStatus());
@@ -117,10 +114,7 @@ public class NoteService {
                 () -> new NoteInvalidException(ErrorType.NOTE_NOT_FOUND_ERROR)
         );
 
-        // 작성자인지 확인
-        if(!findNote.getUser().getId().equals(user.getId())) {
-            throw new AuthLoginException(ErrorType.AUTHORIZATION_ERROR);
-        }
+        isAuthor(user, findNote);
 
         // 해시태그 이름 조회
         List<String> noteHashtagNames = new ArrayList<>();
@@ -146,15 +140,18 @@ public class NoteService {
                 () -> new NoteInvalidException(ErrorType.NOTE_NOT_FOUND_ERROR)
         );
 
-        // 작성자인지 확인
-        if(!findNote.getUser().getId().equals(user.getId())) {
-            throw new AuthLoginException(ErrorType.AUTHORIZATION_ERROR);
-        }
+        isAuthor(user, findNote);
 
         noteRepository.deleteById(note_id);
-//        noteRepository.delete(findNote); // entity 로 삭제하는 건 튜플이 아니라 해당 테이블 전체가 삭제되었음. ???
 
         return new SuccessResponse("성공적으로 삭제되었습니다.");
 
+    }
+
+    // 로그인한 사용자와 노트 작성자가 일치하는지 확인하는 메서드
+    private void isAuthor(AuthUser user, Note findNote) {
+        if(!findNote.getUser().getId().equals(user.getId())) {
+            throw new AuthLoginException(ErrorType.AUTHORIZATION_ERROR);
+        }
     }
 }

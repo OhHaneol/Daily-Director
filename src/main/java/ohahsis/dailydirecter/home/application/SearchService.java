@@ -55,7 +55,6 @@ public class SearchService {
 
 
         // 내용이 해당 키워드를 포함하고 있을 경우
-        // TODO 콘텐츠에서의 검색이 잘 이루어지지 않는 문제 해결하기
         List<Note> notesByContent = noteRepository
                 .findByUser_IdAndContentsContaining(
                         findUser.getId(),
