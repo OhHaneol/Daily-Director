@@ -51,7 +51,6 @@ public class NoteService {
                 () -> new AuthLoginException(ErrorType.AUTHORIZATION_ERROR)
         );
 
-
         // 노트 저장
         var note = Note.builder()   // 왜 builder 를 사용하는가? -> setter 는 어디서나 값을 수정할 수 있어서 객체지향적으로 좋지 못하다.
                 .contents(request.getContents())
@@ -86,7 +85,7 @@ public class NoteService {
                 () -> new NoteInvalidException(ErrorType.NOTE_NOT_FOUND_ERROR)
         );
 
-        isAuthor(user, findNote);
+        isWriter(user, findNote);
 
         findNote.setTitle(request.getTitle());
         findNote.setStatus(request.getStatus());
@@ -114,7 +113,7 @@ public class NoteService {
                 () -> new NoteInvalidException(ErrorType.NOTE_NOT_FOUND_ERROR)
         );
 
-        isAuthor(user, findNote);
+        isWriter(user, findNote);
 
         // 해시태그 이름 조회
         List<String> noteHashtagNames = new ArrayList<>();
@@ -140,16 +139,17 @@ public class NoteService {
                 () -> new NoteInvalidException(ErrorType.NOTE_NOT_FOUND_ERROR)
         );
 
-        isAuthor(user, findNote);
+        isWriter(user, findNote);
 
         noteRepository.deleteById(note_id);
 
         return new SuccessResponse("성공적으로 삭제되었습니다.");
-
     }
 
-    // 로그인한 사용자와 노트 작성자가 일치하는지 확인하는 메서드
-    private void isAuthor(AuthUser user, Note findNote) {
+    /**
+     * note_id argument 를 이용한 외부인 접근 제한 메서드
+     */
+    private void isWriter(AuthUser user, Note findNote) {
         if(!findNote.getUser().getId().equals(user.getId())) {
             throw new AuthLoginException(ErrorType.AUTHORIZATION_ERROR);
         }
