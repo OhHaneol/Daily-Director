@@ -35,7 +35,7 @@ public class TokenService {
         try {
             Jwts.parser().setSigningKey(key.getBytes()).parseClaimsJws(token);
         } catch (Exception e) {
-            if (e.getMessage().contains("JWT expired")) {   // TODO JWT expired 는 정의한 건지, 아니면 실제 error 메시지 내용에 포함되는지?
+            if (e.getMessage().contains("JWT expired")) {   // JWT expired : 토큰 만료 에러 처리
                 throw new AuthorizationException(ErrorType.AUTHORIZATION_ERROR);
             }
             throw new IllegalArgumentException(ErrorType.NULL_TOKEN.getMessage());  // IllegalArgumentException 은 parseClaimsJws 의 예외 처리
@@ -52,12 +52,13 @@ public class TokenService {
     // login 외 타 api 에서 AuthUser 검증 시 적용
     public AuthUser getAuthUser(AuthToken token) {
         verifyToken(token.getToken());  // 토큰 관련 문제가 생길 경우 error
-        var id = getUserIdFromToken(token.getToken());  // TODO 왜 처음부터 Long 으로 하지 않고 var 라고 하지?
+        var id = getUserIdFromToken(token.getToken());
         var user =
                 userRepository
                         .findById(id)
                         .orElseThrow(
-                                () -> new AuthorizationException(ErrorType.AUTHORIZATION_ERROR));   // TODO verifyToken 에서 존재 여부 확인했는데, user 가 반환되지 않는 경우가 있나?
+                                () -> new AuthorizationException(
+                                        ErrorType.AUTHORIZATION_ERROR));   // TODO verifyToken 에서 존재 여부 확인했는데, user 가 반환되지 않는 경우가 있나?
         return new AuthUser(id);
     }
 
