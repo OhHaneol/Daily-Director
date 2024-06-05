@@ -1,5 +1,7 @@
 package ohahsis.dailydirecter.home.presentation;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import ohahsis.dailydirecter.auth.model.AuthUser;
@@ -18,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+@Tag(name = "홈 화면 관리")
 @RestController
 @RequestMapping(path = "/api/home", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
@@ -29,9 +32,7 @@ public class HomeController {
     //      감독 버전에서는 자신의 노트에만 접근하도록 하는 로직 모듈화가 필요하다.
     //      -> JPA find 메서드에 User 조건을 추가해서 해결!
 
-    /**
-     * 노트 검색 - 키워드
-     */
+    @Operation(summary = "노트 검색")
     @GetMapping("/search")
     public ResponseEntity<?> searchKeyword(
             AuthUser user,
@@ -40,9 +41,7 @@ public class HomeController {
         return ResponseDto.ok(response);
     }
 
-    /**
-     * (미)완성 버튼에 따른 노트 목록
-     */
+    @Operation(summary = "(미)완성 버튼에 따른 노트 목록")
     @GetMapping("/notes")
     public ResponseEntity<?> getNotes(
             AuthUser user,
@@ -52,7 +51,6 @@ public class HomeController {
         return ResponseDto.ok(response);
 
     }
-
 
     // TODO 회원 정보, 새로운 노트 추가 버튼 관련해서 어떤 게 필요한지 조사
 }

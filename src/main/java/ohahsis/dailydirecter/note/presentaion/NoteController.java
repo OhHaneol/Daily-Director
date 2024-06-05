@@ -1,5 +1,7 @@
 package ohahsis.dailydirecter.note.presentaion;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -12,13 +14,14 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@Slf4j
+@Tag(name = "노트 관리")
 @RestController
 @RequestMapping(path = "/api/notes", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 public class NoteController {
     private final NoteService noteService;
 
+    @Operation(summary = "노트 생성")
     @PostMapping
     public ResponseEntity<?> createNote(
             AuthUser user,
@@ -27,6 +30,7 @@ public class NoteController {
         return ResponseDto.created(response);
     }
 
+    @Operation(summary = "노트 조회")
     @GetMapping("/{id}")
     public ResponseEntity<?> getNote(
             AuthUser user,
@@ -35,7 +39,7 @@ public class NoteController {
         return ResponseDto.ok(response);
     }
 
-
+    @Operation(summary = "노트 수정")
     @PutMapping("/{id}")
     public ResponseEntity<?> updateNote(
             AuthUser user,
@@ -46,6 +50,7 @@ public class NoteController {
         return ResponseDto.ok(response);
     }
 
+    @Operation(summary = "노트 삭제")
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteNote(
             AuthUser user,
