@@ -1,6 +1,8 @@
 package ohahsis.dailydirecter.auth.presentation;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import ohahsis.dailydirecter.auth.application.AuthService;
@@ -22,6 +24,10 @@ public class AuthController {
     private final AuthService authService;
 
     @Operation(summary = "로그인")
+    @Parameters({
+            @Parameter(name = "email", description = "이메일", required = true),
+            @Parameter(name = "password", description = "비밀번호", required = true)
+    })
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AuthLoginRequest request) {
         var response = authService.login(request);

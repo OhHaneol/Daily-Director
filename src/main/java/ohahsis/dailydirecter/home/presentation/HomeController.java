@@ -1,6 +1,7 @@
 package ohahsis.dailydirecter.home.presentation;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +34,7 @@ public class HomeController {
     //      -> JPA find 메서드에 User 조건을 추가해서 해결!
 
     @Operation(summary = "노트 검색")
+    @Parameter(name = "searchKeyword", description = "검색어", required = true)
     @GetMapping("/search")
     public ResponseEntity<?> searchKeyword(
             AuthUser user,
@@ -42,6 +44,7 @@ public class HomeController {
     }
 
     @Operation(summary = "(미)완성 버튼에 따른 노트 목록")
+    @Parameter(name = "status", description = "완성 여부", required = true)
     @GetMapping("/notes")
     public ResponseEntity<?> getNotes(
             AuthUser user,

@@ -1,6 +1,8 @@
 package ohahsis.dailydirecter.note.presentaion;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.Parameters;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -22,6 +24,12 @@ public class NoteController {
     private final NoteService noteService;
 
     @Operation(summary = "노트 생성")
+    @Parameters({
+            @Parameter(name = "contents", required = true),
+            @Parameter(name = "status"),
+            @Parameter(name = "title"),
+            @Parameter(name = "hashtagNames")
+    })
     @PostMapping
     public ResponseEntity<?> createNote(
             AuthUser user,
@@ -40,6 +48,12 @@ public class NoteController {
     }
 
     @Operation(summary = "노트 수정")
+    @Parameters({
+            @Parameter(name = "contents", required = true),
+            @Parameter(name = "status"),
+            @Parameter(name = "title"),
+            @Parameter(name = "hashtagNames")
+    })
     @PutMapping("/{id}")
     public ResponseEntity<?> updateNote(
             AuthUser user,
