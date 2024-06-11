@@ -23,6 +23,10 @@ spring:
       dialect: org.hibernate.dialect.MySQL8InnoDBDialect
 #    database-platform: org.hibernate.dialect.MySQL8InnoDBDialect
 
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+
 
 server:
 #  port: 8080
