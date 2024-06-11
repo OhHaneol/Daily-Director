@@ -22,12 +22,13 @@
   - 사용 도구: [erdcloud](https://www.erdcloud.com/)
 
 - [x] 사용 skill
-  > - Java 17
-  > - Spring 3.2.5
-  > - gradle
-  > - MySQL
-  > - JPARepository
-  > - AWS + EC2
+  - Java 17
+  - Spring 3.2.5
+  - gradle
+  - MySQL
+  - JPARepository
+  - AWS + EC2
+  - [Swagger UI](https://velog.io/@mj3242/Swagger-3.x-%EC%96%B4%EB%85%B8%ED%85%8C%EC%9D%B4%EC%85%98-%EC%A0%95%EB%A6%AC)
 
 ## 2-5주차(4/28~6/1)
 
