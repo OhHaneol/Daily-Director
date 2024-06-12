@@ -6,7 +6,6 @@ import ohahsis.dailydirecter.auth.model.AuthUser;
 import ohahsis.dailydirecter.exception.dto.ErrorType;
 import ohahsis.dailydirecter.exception.user.UserSignInvalidException;
 import ohahsis.dailydirecter.hashtag.application.HashtagService;
-import ohahsis.dailydirecter.home.dto.request.SearchRequest;
 import ohahsis.dailydirecter.home.dto.response.SearchResponse;
 import ohahsis.dailydirecter.note.domain.Note;
 import ohahsis.dailydirecter.note.infrastructure.NoteRepository;
@@ -33,9 +32,7 @@ public class SearchService {
     @Transactional(readOnly = true)
     public List<SearchResponse> searchKeyword(
             AuthUser user,
-            SearchRequest request) {
-
-        String searchKeyword = request.getSearchKeyword();
+            String searchKeyword) {
 
         User findUser = userRepository
                 .findById(user.getId())
