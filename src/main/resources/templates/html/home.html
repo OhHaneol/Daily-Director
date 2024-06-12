@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily-Director</title>
+    <link rel="stylesheet" href="../css/style_home.css">
+</head>
+<body>
+<header id="header">
+    <!-- 회원 정보 -->
+    <a href="#" id="infoIcon">
+        <img src="../img/icons/infoIcon/infoIcon-white.png">
+    </a>
+
+    <!-- 메인 로고 -->
+    <a href="#" id="logo">
+        <img src="../img/logo/logo-white.png">
+    </a>
+</header>
+
+<main id="main">
+    <!-- 노트 검색 -->
+    <form id="search-box" action="" method="get">
+        <img src="../img/icons/searchIcon/searchIcon-white.png">
+        <input id="search-txt" type="text" name="" placeholder="search note...">
+<!--        <button id="search-btn" type="submit">-->
+<!--            <img src="../img/icons/searchIcon/searchIcon-black.png">-->
+<!--        </button>-->
+    </form>
+
+    <!-- 완성-미완성 버튼 -->
+    <div id="switch-wrapper">
+        <input type="checkbox" id="switch">
+        <label for="switch" id="switch_label">
+            <span id="onf_btn"></span>
+        </label>
+    </div>
+
+    <!-- 노트 리스트 -->
+    <article id="notes-wrapper">
+        <table>
+            <tbody id="note-list"></tbody>
+        </table>
+    </article>
+</main>
+
+<script type="text/javascript" src="../script/noteList.js"></script>
+</body>
+</html>
