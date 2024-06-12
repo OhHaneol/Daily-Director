@@ -2,21 +2,14 @@ package ohahsis.dailydirecter.home.presentation;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import ohahsis.dailydirecter.auth.model.AuthUser;
 import ohahsis.dailydirecter.common.model.ResponseDto;
 import ohahsis.dailydirecter.home.application.NoteListService;
 import ohahsis.dailydirecter.home.application.SearchService;
-import ohahsis.dailydirecter.home.dto.request.NoteListRequest;
-import ohahsis.dailydirecter.home.dto.request.SearchRequest;
-import ohahsis.dailydirecter.home.dto.response.NoteListResponse;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -36,20 +29,19 @@ public class HomeController {
     @GetMapping("/search")
     public ResponseEntity<?> searchKeyword(
             AuthUser user,
-            @RequestBody @Valid SearchRequest request) {
-        var response = searchService.searchKeyword(user, request);
+            @RequestParam(name = "searchKeyword", required = true) String searchKeyword) {
+        var response = searchService.searchKeyword(user, searchKeyword);
         return ResponseDto.ok(response);
     }
 
+    @CrossOrigin(origins = "http://localhost:63342")
     @Operation(summary = "(미)완성 버튼에 따른 노트 목록")
     @GetMapping("/notes")
     public ResponseEntity<?> getNotes(
             AuthUser user,
-            @RequestBody @Valid NoteListRequest request) {
-        // TODO Contents 를 객체로 만들어서? List 없애기
-        List<NoteListResponse> response = noteListService.getNoteList(user, request);
+            @RequestParam(name = "status", required = false, defaultValue = "false") boolean status) {
+        var response = noteListService.getNoteList(user, status);
         return ResponseDto.ok(response);
-
     }
 
     // TODO 회원 정보, 새로운 노트 추가 버튼 관련해서 어떤 게 필요한지 조사
