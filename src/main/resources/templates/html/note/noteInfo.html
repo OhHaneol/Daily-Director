@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, width=1920, initial-scale=1.0"/>
+    <title>Daily-Director</title>
+    <link rel="stylesheet" href="../../css/style_noteInfo.css">
+</head>
+
+
+<body>
+<header id="header">
+
+    <!-- 메인 로고 -->
+    <a href="#" id="logo">
+        <img src="../../img/logo/logo-white.png">
+    </a>
+
+    <button id="info-close-btn">
+        <img src="../../img/icons/noteIcon/info-close-white.png"/>
+    </button>
+</header>
+
+
+<main id="main">
+
+    <div>
+        <input id="title" type="text" placeholder="제목" autocomplete="off">
+    </div>
+    <table id="hashtag">
+        <tbody>
+        <tr>
+            <td><input class="hashtag" type="text"placeholder="#" autocomplete="off"></td>
+            <td><input class="hashtag" type="text"placeholder="#" autocomplete="off"></td>
+            <td><input class="hashtag" type="text"placeholder="#" autocomplete="off"></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <!-- 완성-미완성 버튼 -->
+    <div id="switch-wrapper">
+        <input type="checkbox" id="switch">
+        <label for="switch" id="switch_label">
+            <span id="onf_btn"></span>
+        </label>
+    </div>
+
+    <article id="content-wrapper">
+        <p id="content-read" type="text" placeholder="여기에 적으세요."></p>
+    </article>
+
+</main>
+
+<script type="text/javascript" src="../../script/noteInfo.js"></script>
+
+</body>
+</html>

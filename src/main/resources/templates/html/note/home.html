@@ -21,13 +21,12 @@
 
 <main id="main">
     <!-- 노트 검색 -->
-    <form id="search-box" action="" method="get">
-        <img src="../img/icons/searchIcon/searchIcon-white.png">
-        <input id="search-txt" type="text" name="" placeholder="search note...">
-<!--        <button id="search-btn" type="submit">-->
-<!--            <img src="../img/icons/searchIcon/searchIcon-black.png">-->
-<!--        </button>-->
-    </form>
+    <div id="search-box">
+        <input id="search-txt" type="text" name="" placeholder="search note..." autocomplete="off">
+        <button id="search-btn" type="button">
+            <img src="../img/icons/searchIcon/searchIcon-white.png">
+        </button>
+    </div>
 
     <!-- 완성-미완성 버튼 -->
     <div id="switch-wrapper">
@@ -46,5 +45,7 @@
 </main>
 
 <script type="text/javascript" src="../script/noteList.js"></script>
+
+
 </body>
 </html>
