@@ -1,11 +1,15 @@
 html, body {
     width: 390px;
-    height: 844px;
-    margin: 0;
+    height: 800px;
+    margin: 0 0 0 10px;
 }
 
 a {
     text-decoration: none;
+}
+
+button {
+    cursor: pointer;
 }
 
 #header {
@@ -13,9 +17,6 @@ a {
     position: fixed;
     padding-bottom: 10px;
     /* 헤더 고정하면서 생긴 여백 없애기*/
-    top: 0;
-    left: 0;
-    right: 0;
     width: 390px;
     height: 40px;
 
@@ -61,26 +62,27 @@ a {
         padding: 5px;
         border: 2px solid black;
 
+/*
         img {
             float: left;
             width: 20px;
             opacity: 50%;
         }
+        */
 
         #search-txt {
             border: none;
             background: none;
             outline: none;
-            float: right;
+            float: left;
             display: flex;
-            padding-left: 10px;
+            padding-left: 20px;
             padding-top: 2px;
             line-height: 10px;
-            width: 260px;
+            width: 230px;
             color: rgba( 255, 255, 255, 0.7);
         }
 
-/*
         #search-btn {
             float: right;
             display: flex;
@@ -95,7 +97,7 @@ a {
                 width: 20px;
             }
         }
-        */
+
 
     }
 
@@ -160,11 +162,11 @@ a {
         tr {
             display: block;
             width: 290px;
-            border: 2px solid rgba( 255, 255, 255, 0.5);
+            border: none;
             border-radius: 20px;
             padding: 10px;
             margin-bottom: 12px;
-            background-color: rgba( 255, 255, 255, 0.1 );
+            background: rgba( 255, 255, 255, 0.1 );
             td {
                 color: white;
                 opacity: 80%;
