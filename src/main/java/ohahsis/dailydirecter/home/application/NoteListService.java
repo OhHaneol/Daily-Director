@@ -31,7 +31,10 @@ public class NoteListService {
                 new NoteListResponse(
                         note.getTitle(),
                         note.getContents(),
-                        note.getStatus())));
+                        note.getStatus(),
+                        note.getNoteId(),
+                        note.getCreatedAt(),
+                        note.getModifiedAt())));
 
         return response;
 
