@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
+import java.util.function.Predicate;
 
 import static ohahsis.dailydirecter.note.NoteConstants.CONTENTS_MAX_SIZE;
 
@@ -37,8 +38,8 @@ public class NoteService {
     public NoteSaveResponse writeNote(AuthUser user, NoteRequest request) {
 
         // 제목과 내용이 모두 없는 경우
-        if (request.getContents().isEmpty() && request.getTitle().isBlank()) {
-            throw new NoteInvalidException(ErrorType.NOT_BLANK_ERROR);
+        if (request.getTitle().isBlank() && request.getContents().stream().allMatch(Predicate.isEqual(""))) {
+            throw new NoteInvalidException(ErrorType.NOT_BOTH_BLANK_ERROR);
         }
 
         // 기승전결 외 5개 이상의 문서 저장 요청이 온 경우
@@ -70,7 +71,8 @@ public class NoteService {
                 savedNote.getStatus(),
                 savedNote.getTitle(),
                 savedNoteHashtagNames,
-                savedNote.getUser().getId());
+                savedNote.getUser().getId(),
+                savedNote.getCreatedAt());
     }
 
     /**
@@ -91,6 +93,10 @@ public class NoteService {
         findNote.setStatus(request.getStatus());
         findNote.setContents(request.getContents());
 
+        if(findNote.getTitle().isBlank() && findNote.getContents().stream().allMatch(Predicate.isEqual(""))) {
+            throw new NoteInvalidException(ErrorType.NOT_BOTH_BLANK_ERROR);
+        }
+
         List<String> savedNoteHashtagNames = hashtagService.saveNoteHashtag(findNote, request);
 
         return new NoteSaveResponse(
@@ -99,7 +105,8 @@ public class NoteService {
                 findNote.getStatus(),
                 findNote.getTitle(),
                 savedNoteHashtagNames,
-                user.getId()
+                user.getId(),
+                findNote.getModifiedAt()
         );
     }
 
