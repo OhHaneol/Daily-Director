@@ -1,28 +1,95 @@
 html, body {
     width: 390px;
-    height: 100%;
-    margin: 0;
+    height: 800px;
+    margin: 0 0 0 10px;
 }
 
+a {
+    text-decoration: none;
+}
+button {
+    cursor: pointer;
+}
+
+/* 헤더 */
 #header {
     background-color: black;
     position: fixed;
     padding-bottom: 10px;
-    /* 헤더 고정하면서 생긴 여백 없애기*/
-    top: 0;
-    left: 0;
-    right: 0;
     width: 390px;
     height: 40px;
 
-    #logo {
-        height: 40px;
-        padding-top: 10px;
-        padding-left: 140px;
-        img {
-            padding-top: 10px;
-            width: 100px;
-        }
-    }
+}
 
+#logo {
+    display: flex;
+    height: 60px;
+    margin-left: 125px;
+    width: 140px;
+    float: left;
+
+    img {
+        padding-top: 10px;
+        opacity: 90%;
+        width: 140px;
+    }
+}
+
+#content-info-btn {
+    background: none;
+    border: none;
+    float: right;
+    margin-top: 20px;
+    margin-right: 11px;
+
+    img {
+        width: 25px;
+        opacity: 80%;
+    }
+}
+
+
+/* 바디 */
+#main {
+    height: 100%;
+    padding-top: 70px;
+    width: 390px;
+    background-color: black;
+}
+
+/* 기승전결 선택 */
+#content-select {
+    margin-left: 105px;
+}
+
+.content-select-li {
+    display: inline-block;
+}
+
+.content-select-btn {
+    background: none;
+    border: none;
+
+    img {
+        width: 10px;
+        opacity: 50%;
+    }
+}
+
+/* 작성란 */
+#content-wrapper {
+    margin-left: 13px;
+    padding-top: 10px;
+    #content-write {
+        border: none;
+        border-radius: 14px;
+        width: 340px;
+        height: 700px;
+        background: rgba( 255, 255, 255, 0.1);
+        outline: none;
+        padding: 16px 13px 18px 16px;
+        color: rgba( 255, 255, 255, 0.9);
+        line-height: 1.6;
+        font-size : 14px;
+    }
 }

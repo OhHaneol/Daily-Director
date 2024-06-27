@@ -85,7 +85,9 @@ public class SearchService {
                                 note.getNoteId(),
                                 keywordType,
                                 note.getTitle(),
-                                note.getContents())));
+                                note.getContents(),
+                                note.getCreatedAt(),
+                                note.getModifiedAt())));
     }
 
 }

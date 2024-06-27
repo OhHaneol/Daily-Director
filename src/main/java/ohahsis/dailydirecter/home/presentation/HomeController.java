@@ -12,8 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
+@CrossOrigin(origins = "http://localhost:63342")
 @Tag(name = "홈 화면 관리")
 @RestController
 @RequestMapping(path = "/api/home", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -36,7 +35,6 @@ public class HomeController {
         return ResponseDto.ok(response);
     }
 
-    @CrossOrigin(origins = "http://localhost:63342")
     @Operation(summary = "(미)완성 버튼에 따른 노트 목록")
     @Parameter(name = "status", description = "완성 여부", required = true)
     @GetMapping("/notes")

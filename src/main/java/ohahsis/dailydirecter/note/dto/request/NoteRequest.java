@@ -1,7 +1,5 @@
 package ohahsis.dailydirecter.note.dto.request;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 import org.springframework.lang.Nullable;
@@ -13,7 +11,7 @@ import java.util.List;
 public class NoteRequest {
 
     @Size(min = 1, max = 4, message = "최소 1개, 최대 4개의 콘텐츠는 필수입니다.")
-    private List<@NotBlank(message = "콘텐츠의 내용은 빈 칸이어서는 안 됩니다.") String> contents;
+    private List<String> contents;
 
     @Nullable
     private Boolean status;
@@ -21,7 +19,6 @@ public class NoteRequest {
     @Nullable
     private String title;
 
-    @NotNull(message = "해시태그 목록은 null 일 수 없습니다.")
     @Size(max = 3, message = "해시태그는 최대 3개까지 등록이 가능합니다.")
     private LinkedHashSet<String> hashtagNames;
 }

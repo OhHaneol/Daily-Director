@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily-Director</title>
+    <link rel="stylesheet" href="../../css/style_home.css">
+</head>
+
+
+<body>
+<header id="header">
+    <!-- 회원 정보 -->
+    <a href="#" id="infoIcon">
+        <img src="../../img/icons/infoIcon/user-info-white.png">
+    </a>
+
+    <!-- 메인 로고 -->
+    <a href="#" id="logo">
+        <img src="../../img/logo/logo-white.png">
+    </a>
+</header>
+
+<main id="main">
+    <!-- 노트 검색 -->
+    <div id="search-box">
+        <input id="search-txt" type="text" placeholder="search note..." autocomplete="off">
+        <button id="search-btn" type="button">
+            <img src="../../img/icons/searchIcon/searchIcon-white.png">
+        </button>
+    </div>
+
+    <!-- 완성-미완성 버튼 -->
+    <div id="switch-wrapper">
+        <input type="checkbox" id="switch">
+        <label for="switch" id="switch_label">
+            <span id="onf_btn"></span>
+        </label>
+    </div>
+
+    <!-- 노트 목록 -->
+    <article id="notes-wrapper">
+        <table>
+            <tbody id="note-list">
+            <tr th:each="note : ${notes}">
+                <td>
+                    <a th:href="@{/note/{id}(id=${note.note_id})}" th:text="${note.title}"></a>
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </article>
+
+    <!-- 노트 생성 버튼 -->
+    <footer id="note-create">
+        <button id="create-note-btn" type="button">
+            <img src="../../img/icons/noteIcon/create-note-btn-white.png">
+        </button>
+    </footer>
+</main>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    const notes = /*[[${notes}]]*/ [];
+    /*]]>*/
+
+</script>
+<script>
+    document.getElementById('create-note-btn').addEventListener('click', () => {
+        window.location.href = 'noteInfo.html';
+    });
+</script>
+<script type="text/javascript" src="../../script/noteList.js"></script>
+
+</body>
+</html>

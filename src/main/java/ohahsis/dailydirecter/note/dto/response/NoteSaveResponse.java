@@ -3,6 +3,7 @@ package ohahsis.dailydirecter.note.dto.response;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -14,4 +15,5 @@ public class NoteSaveResponse {
     private String title;
     private List<String> noteHashtagNames;
     private Long user_id;
+    private LocalDateTime modifiedAt;
 }

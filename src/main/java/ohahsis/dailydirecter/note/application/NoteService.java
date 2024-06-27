@@ -17,8 +17,10 @@ import ohahsis.dailydirecter.user.domain.User;
 import ohahsis.dailydirecter.user.infrastructure.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.*;
+import java.util.function.Predicate;
 
 import static ohahsis.dailydirecter.note.NoteConstants.CONTENTS_MAX_SIZE;
 
@@ -29,16 +31,19 @@ public class NoteService {
     private final NoteRepository noteRepository;
     private final UserRepository userRepository;
     private final HashtagService hashtagService;
+//    private final TransactionTemplate txTemplate;
 
     /**
      * 노트 생성
+     * TODO : SRP 지키기. 생성하는 게 책임인데, 유효성 조회 생성 모두가 섞여 있음. 이를 쪼개야 함.
+     * 1. 메서드 분리
+     * 2. 트랜잭션이 필요한 곳에서만 메서드 넣어주기.
      */
     @Transactional
     public NoteSaveResponse writeNote(AuthUser user, NoteRequest request) {
-
         // 제목과 내용이 모두 없는 경우
-        if (request.getContents().isEmpty() && request.getTitle().isBlank()) {
-            throw new NoteInvalidException(ErrorType.NOT_BLANK_ERROR);
+        if (request.getTitle().isBlank() && request.getContents().stream().allMatch(Predicate.isEqual(""))) {
+            throw new NoteInvalidException(ErrorType.NOT_BOTH_BLANK_ERROR);
         }
 
         // 기승전결 외 5개 이상의 문서 저장 요청이 온 경우
@@ -49,7 +54,9 @@ public class NoteService {
         // 노트 작성자
         User noteUser = userRepository.findById(user.getId()).orElseThrow(  // TODO 해당 컨트롤러에 Auth 접근으로써 user 는 이미 확인되었는데, null 일 경우를 꼭 대비해야만 하나?
                 () -> new AuthLoginException(ErrorType.AUTHORIZATION_ERROR)
-        );
+        ); // 10초
+
+
 
         // 노트 저장
         var note = Note.builder()   // 왜 builder 를 사용하는가? -> setter 는 어디서나 값을 수정할 수 있어서 객체지향적으로 좋지 못하다.
@@ -59,6 +66,9 @@ public class NoteService {
                 .user(noteUser)
                 .build();
 
+        /*txTemplate.execute(
+                noteRepository.save(note)
+        );*/
         var savedNote = noteRepository.save(note);
 
         // TODO Service call Service
@@ -70,7 +80,8 @@ public class NoteService {
                 savedNote.getStatus(),
                 savedNote.getTitle(),
                 savedNoteHashtagNames,
-                savedNote.getUser().getId());
+                savedNote.getUser().getId(),
+                savedNote.getCreatedAt());
     }
 
     /**
@@ -91,6 +102,10 @@ public class NoteService {
         findNote.setStatus(request.getStatus());
         findNote.setContents(request.getContents());
 
+        if(findNote.getTitle().isBlank() && findNote.getContents().stream().allMatch(Predicate.isEqual(""))) {
+            throw new NoteInvalidException(ErrorType.NOT_BOTH_BLANK_ERROR);
+        }
+
         List<String> savedNoteHashtagNames = hashtagService.saveNoteHashtag(findNote, request);
 
         return new NoteSaveResponse(
@@ -99,7 +114,8 @@ public class NoteService {
                 findNote.getStatus(),
                 findNote.getTitle(),
                 savedNoteHashtagNames,
-                user.getId()
+                user.getId(),
+                findNote.getModifiedAt()
         );
     }
 
