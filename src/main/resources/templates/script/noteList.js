@@ -2,7 +2,15 @@ const searchInput = document.getElementById('search-txt');
 const searchButton = document.getElementById('search-btn');
 const noteList = document.getElementById('note-list');
 const switchButton = document.getElementById('switch');
-const token = 'eyJhbGciOiJIUzI1NiJ9.eyJuaWNrbmFtZSI6InRlc3RlcjEiLCJ1aWQiOjF9.WNoIH0Tl-tsM6M7uf0YEaOlH8KrmM1ja2o78zs3AHKw';
+//const token = 'eyJhbGciOiJIUzI1NiJ9.eyJuaWNrbmFtZSI6InRlc3RlcjEiLCJ1aWQiOjF9.WNoIH0Tl-tsM6M7uf0YEaOlH8KrmM1ja2o78zs3AHKw';
+
+// 로컬 스토리지에서 토큰을 가져옵니다.
+const token = localStorage.getItem('authToken');
+
+// 토큰이 없으면 로그인 페이지로 리다이렉트
+if (!token) {
+    window.location.href = '../user/login.html';
+}
 
 
 // 초기에 미완성 노트 목록을 가져옵니다.

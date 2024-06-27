@@ -112,6 +112,7 @@ function saveNote() {
                 hashtagNames,
                 contents,
                 status
+                // TODO user 의 id 값을 추가로 넣어야 함. 백엔드도 전반적인 수정 필요! note api 도 끝에 유저 id param 추가.
             })
         })
         .then(response => {
