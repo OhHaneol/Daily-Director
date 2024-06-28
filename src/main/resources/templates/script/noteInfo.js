@@ -1,7 +1,6 @@
 // 페이지 로드 시 쿼리 파라미터에서 noteId 가져오기
 const urlParams = new URLSearchParams(window.location.search);
 const noteId = urlParams.get('noteId');
-
 // 로컬 스토리지에서 토큰을 가져옵니다.
 const token = localStorage.getItem('authToken');
 
@@ -71,26 +70,6 @@ function setupNewNote() {
     document.getElementById('switch').checked = false;
 }
 
-
-document.addEventListener('DOMContentLoaded', function() {
-    const closeButton = document.getElementById('info-close-btn');
-    if (closeButton) {
-        closeButton.addEventListener('click', function(event) {
-            event.preventDefault(); // 기본 동작 방지
-            saveNote()
-//            .then(() => {
-//                window.location.href = 'home.html'; // 저장 후 홈 화면으로 이동
-//            })
-            .catch(error => {
-                console.error('Failed to save note:', error);
-                // 에러 발생 시 사용자에게 알림을 줄 수 있습니다.
-//                alert('Failed to save note. Please try again.');
-                alert(error);
-            });
-        });
-    }
-});
-
 let isSaving = false;
 
 function saveNote() {
@@ -154,20 +133,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.error('Failed to save note:', error);
                 alert(error.message); // 서버에서 받은 오류 메시지를 표시
             });
-        });
-    }
-});
-
-let isUnloading = false;
-
-window.addEventListener('beforeunload', function(event) {
-    if (!isUnloading) {
-        isUnloading = true;
-        event.preventDefault(); // 표준 기반 브라우저에서는 이 메시지가 무시됩니다.
-        event.returnValue = ''; // 크롬에서는 이 설정이 필요합니다.
-
-        saveNote().finally(() => {
-            isUnloading = false;
         });
     }
 });
