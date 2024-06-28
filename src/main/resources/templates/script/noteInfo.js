@@ -1,7 +1,13 @@
 // 페이지 로드 시 쿼리 파라미터에서 noteId 가져오기
 const urlParams = new URLSearchParams(window.location.search);
 const noteId = urlParams.get('noteId');
-const token = 'eyJhbGciOiJIUzI1NiJ9.eyJuaWNrbmFtZSI6InRlc3RlcjEiLCJ1aWQiOjF9.WNoIH0Tl-tsM6M7uf0YEaOlH8KrmM1ja2o78zs3AHKw';
+// 로컬 스토리지에서 토큰을 가져옵니다.
+const token = localStorage.getItem('authToken');
+
+// 토큰이 없으면 로그인 페이지로 리다이렉트
+if (!token) {
+    window.location.href = '../user/login.html';
+}
 
 if (noteId) {
     // 기존 노트 수정
@@ -63,26 +69,6 @@ function setupNewNote() {
     document.querySelectorAll('.content-write').forEach(textarea => textarea.value = '');
     document.getElementById('switch').checked = false;
 }
-
-
-document.addEventListener('DOMContentLoaded', function() {
-    const closeButton = document.getElementById('info-close-btn');
-    if (closeButton) {
-        closeButton.addEventListener('click', function(event) {
-            event.preventDefault(); // 기본 동작 방지
-            saveNote()
-//            .then(() => {
-//                window.location.href = 'home.html'; // 저장 후 홈 화면으로 이동
-//            })
-            .catch(error => {
-                console.error('Failed to save note:', error);
-                // 에러 발생 시 사용자에게 알림을 줄 수 있습니다.
-//                alert('Failed to save note. Please try again.');
-                alert(error);
-            });
-        });
-    }
-});
 
 let isSaving = false;
 
@@ -147,20 +133,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.error('Failed to save note:', error);
                 alert(error.message); // 서버에서 받은 오류 메시지를 표시
             });
-        });
-    }
-});
-
-let isUnloading = false;
-
-window.addEventListener('beforeunload', function(event) {
-    if (!isUnloading) {
-        isUnloading = true;
-        event.preventDefault(); // 표준 기반 브라우저에서는 이 메시지가 무시됩니다.
-        event.returnValue = ''; // 크롬에서는 이 설정이 필요합니다.
-
-        saveNote().finally(() => {
-            isUnloading = false;
         });
     }
 });
