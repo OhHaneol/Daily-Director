@@ -1,7 +1,14 @@
 // 페이지 로드 시 쿼리 파라미터에서 noteId 가져오기
 const urlParams = new URLSearchParams(window.location.search);
 const noteId = urlParams.get('noteId');
-const token = 'eyJhbGciOiJIUzI1NiJ9.eyJuaWNrbmFtZSI6InRlc3RlcjEiLCJ1aWQiOjF9.WNoIH0Tl-tsM6M7uf0YEaOlH8KrmM1ja2o78zs3AHKw';
+
+// 로컬 스토리지에서 토큰을 가져옵니다.
+const token = localStorage.getItem('authToken');
+
+// 토큰이 없으면 로그인 페이지로 리다이렉트
+if (!token) {
+    window.location.href = '../user/login.html';
+}
 
 if (noteId) {
     // 기존 노트 수정
