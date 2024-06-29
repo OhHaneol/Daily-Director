@@ -28,7 +28,9 @@ input {
 #logo {
     display: flex;
     height: 60px;
+    /*
     margin-left: 125px;
+    */
     width: 140px;
     float: left;
 
@@ -38,16 +40,34 @@ input {
         width: 140px;
     }
 }
-
-#info-close-btn {
+#note-save-btn {
     background: none;
     border: none;
+
+    height: 60px;
+    margin-left: 125px;
+    width: 140px;
+
+    /*
     float: right;
     margin-top: 18px;
     margin-right: 11px;
 
     img {
-        width: 20px;
+        width: 27px;
+        opacity: 80%;
+    }*/
+}
+#note-delete-btn {
+    background: none;
+    border: none;
+
+    float: right;
+    margin-top: 15px;
+    margin-right: 11px;
+
+    img {
+        width: 27px;
         opacity: 80%;
     }
 }

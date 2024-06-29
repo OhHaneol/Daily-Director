@@ -96,6 +96,14 @@ function renderNotes(notes) {
         titleSpan.style.fontWeight = 'bold';  // 제목을 굵게 표시
         td.appendChild(titleSpan);
 
+        if (note.searchType) {
+            const p = document.createElement('p');
+            p.textContent = note.searchType;
+            p.classList.add('search-type');
+            titleSpan.classList.add('search-title')
+            td.appendChild(p);
+        }
+
         // 줄바꿈
         td.appendChild(document.createElement('br'));
 
@@ -105,13 +113,6 @@ function renderNotes(notes) {
         contentSpan.textContent = content ? truncateContent(content, 24) : '(내용 없음)';
         contentSpan.style.color = '#666';  // 내용을 회색으로 표시
         td.appendChild(contentSpan);
-
-        if (note.searchType) {
-            const p = document.createElement('p');
-            p.textContent = note.searchType;
-            p.classList.add('search-type');
-            td.appendChild(p);
-        }
 
         tr.appendChild(td);
         noteList.appendChild(tr);

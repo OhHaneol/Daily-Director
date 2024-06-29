@@ -163,13 +163,13 @@ button {
                 color: white;
                 opacity: 80%;
 
-                a {
-                    display: inline-black;
+                .search-title {
                     float: left;
                 }
                 p {
-                    display: inline-black;
-                    float: right;
+                    display: flex;
+                    color: #00CC88;
+                    margin: 0 0 0 210px;
                 }
             }
         }
