@@ -2,7 +2,6 @@ const searchInput = document.getElementById('search-txt');
 const searchButton = document.getElementById('search-btn');
 const noteList = document.getElementById('note-list');
 const switchButton = document.getElementById('switch');
-//const token = 'eyJhbGciOiJIUzI1NiJ9.eyJuaWNrbmFtZSI6InRlc3RlcjEiLCJ1aWQiOjF9.WNoIH0Tl-tsM6M7uf0YEaOlH8KrmM1ja2o78zs3AHKw';
 
 // 로컬 스토리지에서 토큰을 가져옵니다.
 const token = localStorage.getItem('authToken');
@@ -97,6 +96,14 @@ function renderNotes(notes) {
         titleSpan.style.fontWeight = 'bold';  // 제목을 굵게 표시
         td.appendChild(titleSpan);
 
+        if (note.searchType) {
+            const p = document.createElement('p');
+            p.textContent = note.searchType;
+            p.classList.add('search-type');
+            titleSpan.classList.add('search-title')
+            td.appendChild(p);
+        }
+
         // 줄바꿈
         td.appendChild(document.createElement('br'));
 
@@ -106,13 +113,6 @@ function renderNotes(notes) {
         contentSpan.textContent = content ? truncateContent(content, 24) : '(내용 없음)';
         contentSpan.style.color = '#666';  // 내용을 회색으로 표시
         td.appendChild(contentSpan);
-
-        if (note.searchType) {
-            const p = document.createElement('p');
-            p.textContent = note.searchType;
-            p.classList.add('search-type');
-            td.appendChild(p);
-        }
 
         tr.appendChild(td);
         noteList.appendChild(tr);

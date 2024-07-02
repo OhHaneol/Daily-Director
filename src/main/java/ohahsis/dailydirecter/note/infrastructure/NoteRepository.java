@@ -2,6 +2,8 @@ package ohahsis.dailydirecter.note.infrastructure;
 
 import ohahsis.dailydirecter.note.domain.Note;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,7 +17,9 @@ public interface NoteRepository extends JpaRepository<Note, Long> {
 
     List<Note> findByUser_IdAndTitleContaining(Long userId, String keyword);
 
-    List<Note> findByUser_IdAndContentsContaining(Long userId, String keyword);
+    //    List<Note> findByUser_IdAndContentsContaining(Long userId, String keyword);
+    @Query("SELECT n FROM Note n JOIN n.user u WHERE u.id = :userId AND EXISTS (SELECT 1 FROM n.contents c WHERE c LIKE %:keyword%)")
+    List<Note> findByUser_IdAndContentsContaining(@Param("userId") Long userId, @Param("keyword") String keyword);
 
     Note findByUser_IdAndNoteId(Long userId, Long noteId);
 

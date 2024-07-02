@@ -1,7 +1,14 @@
 // 페이지 로드 시 쿼리 파라미터에서 noteId 가져오기
 const urlParams = new URLSearchParams(window.location.search);
 const noteId = urlParams.get('noteId');
-const token = 'eyJhbGciOiJIUzI1NiJ9.eyJuaWNrbmFtZSI6InRlc3RlcjEiLCJ1aWQiOjF9.WNoIH0Tl-tsM6M7uf0YEaOlH8KrmM1ja2o78zs3AHKw';
+// 로컬 스토리지에서 토큰을 가져옵니다.
+const token = localStorage.getItem('authToken');
+let originalData = null;
+
+// 토큰이 없으면 로그인 페이지로 리다이렉트
+if (!token) {
+    window.location.href = '../user/login.html';
+}
 
 if (noteId) {
     // 기존 노트 수정
@@ -29,6 +36,7 @@ function fetchNote(noteId) {
       })
     .then(data => {
       // 노트 내용 렌더링
+      originalData = data.data;
       document.getElementById('title').value = data.data.title || '';    // input 태그의 value 에 출력 가능하게 함.
       console.log("data.title = " + data.data.title);
 
@@ -64,30 +72,35 @@ function setupNewNote() {
     document.getElementById('switch').checked = false;
 }
 
+// 데이터가 변경되었는지 확인하는 함수
+function isDataChanged() {
+    if (!originalData) return true;  // 새 노트인 경우
 
-document.addEventListener('DOMContentLoaded', function() {
-    const closeButton = document.getElementById('info-close-btn');
-    if (closeButton) {
-        closeButton.addEventListener('click', function(event) {
-            event.preventDefault(); // 기본 동작 방지
-            saveNote()
-//            .then(() => {
-//                window.location.href = 'home.html'; // 저장 후 홈 화면으로 이동
-//            })
-            .catch(error => {
-                console.error('Failed to save note:', error);
-                // 에러 발생 시 사용자에게 알림을 줄 수 있습니다.
-//                alert('Failed to save note. Please try again.');
-                alert(error);
-            });
-        });
-    }
-});
+    const title = document.getElementById('title').value;
+    const hashtagInputs = document.querySelectorAll('.hashtag');
+    const hashtagNames = Array.from(hashtagInputs).map(input => input.value).filter(value => value.trim() !== '');
+    const contentTextareas = document.querySelectorAll('.content-write');
+    const contents = Array.from(contentTextareas).map(textarea => textarea.value);
+    const status = document.getElementById('switch').checked;
 
+    if (title !== originalData.title) return true;
+    if (status !== originalData.status) return true;
+    if (JSON.stringify(hashtagNames) !== JSON.stringify(originalData.noteHashtagNames)) return true;
+    if (JSON.stringify(contents) !== JSON.stringify(originalData.contents)) return true;
+
+    return false;
+}
+
+// 노트 저장
 let isSaving = false;
-
 function saveNote() {
     if (isSaving) return Promise.resolve(); // 이미 저장 중이면 즉시 resolve
+
+    if (!isDataChanged()) {
+        // 변경된 내용이 없으면 바로 홈으로 이동
+        window.location.href = 'home.html';
+        return Promise.resolve();
+    }
 
     isSaving = true;
     return new Promise((resolve, reject) => {
@@ -112,7 +125,6 @@ function saveNote() {
                 hashtagNames,
                 contents,
                 status
-                // TODO user 의 id 값을 추가로 넣어야 함. 백엔드도 전반적인 수정 필요! note api 도 끝에 유저 id param 추가.
             })
         })
         .then(response => {
@@ -125,6 +137,7 @@ function saveNote() {
         })
         .then(data => {
             console.log('Note saved successfully:', data);
+            window.location.href = 'home.html';
             resolve(data);
         })
         .catch(error => {
@@ -138,9 +151,9 @@ function saveNote() {
 }
 
 document.addEventListener('DOMContentLoaded', function() {
-    const closeButton = document.getElementById('info-close-btn');
-    if (closeButton) {
-        closeButton.addEventListener('click', function(event) {
+    const saveButton = document.getElementById('note-save-btn');
+    if (saveButton) {
+        saveButton.addEventListener('click', function(event) {
             event.preventDefault();
             saveNote()
             .catch(error => {
@@ -151,16 +164,50 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-let isUnloading = false;
+// 노트 삭제
+function deleteNote() {
+    if (!noteId) {
+        console.error('No note ID found');
+        return;
+    }
 
-window.addEventListener('beforeunload', function(event) {
-    if (!isUnloading) {
-        isUnloading = true;
-        event.preventDefault(); // 표준 기반 브라우저에서는 이 메시지가 무시됩니다.
-        event.returnValue = ''; // 크롬에서는 이 설정이 필요합니다.
+    if (!confirm('정말로 이 노트를 삭제하시겠습니까?')) {
+        return;
+    }
 
-        saveNote().finally(() => {
-            isUnloading = false;
+    const url = `http://localhost:8080/api/notes/${noteId}`;
+    fetch(url, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-FP-AUTH-TOKEN': token
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            return response.json().then(errorData => {
+                throw new Error(errorData.reason || 'Failed to delete note');
+            });
+        }
+        return response.json();
+    })
+    .then(data => {
+        console.log('Note deleted successfully:', data);
+        window.location.href = 'home.html';
+    })
+    .catch(error => {
+        console.error('Error deleting note:', error);
+        alert(error.message);
+    });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const deleteButton = document.getElementById('note-delete-btn');
+    if (deleteButton) {
+        console.log("btn clicked!");
+        deleteButton.addEventListener('click', function(event) {
+            event.preventDefault();
+            deleteNote();
         });
     }
 });
