@@ -21,10 +21,21 @@ public class NoteListService {
      */
     @Transactional(readOnly = true)
     public List<NoteListResponse> getNoteList(AuthUser user, boolean status) {
+        List<Note> notesByStatus = getNotesByStatus(user, status);
+
+        List<NoteListResponse> response = getNoteListResponsesByNoteStatus(notesByStatus);
+
+        return response;
+    }
+
+    private List<Note> getNotesByStatus(AuthUser user, boolean status) {
         List<Note> notesByStatus = noteRepository.findByUser_IdAndStatus(
                 user.getId(),
                 status);
+        return notesByStatus;
+    }
 
+    private List<NoteListResponse> getNoteListResponsesByNoteStatus(List<Note> notesByStatus) {
         List<NoteListResponse> response = new ArrayList<>();
 
         notesByStatus.stream().forEach(note -> response.add(
@@ -35,8 +46,6 @@ public class NoteListService {
                         note.getNoteId(),
                         note.getCreatedAt(),
                         note.getModifiedAt())));
-
         return response;
-
     }
 }
