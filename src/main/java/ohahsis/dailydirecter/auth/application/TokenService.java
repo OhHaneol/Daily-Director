@@ -25,10 +25,24 @@ public class TokenService {
     private final UserRepository userRepository;
     private String key;
 
-    @Value("${jwt.secret.key}")
-    public void getSecretKey(String secretKey) {
-        key = secretKey;
+    // login api 에 적용
+    public String jwtBuilder(Long id, String nickname) {
+        Claims claims = Jwts.claims();  // TODO claims 가 뭐지? -> jwt 의 payload 로, ~~
+        claims.put("nickname", nickname);
+        claims.put("uid", id);
+        Date now = new Date();
+        return Jwts.builder()
+                .setClaims(claims)
+                // TODO : 유효기간 설정은 다음 MVC에서 진행한다.
+                // .setExpiration(new Date(now.getTime() + accessTokenValidMillisecond))
+                .signWith(SignatureAlgorithm.HS256, key.getBytes())
+                .compact();
     }
+
+//    @Value("${jwt.secret.key}")
+//    public void getSecretKey(String secretKey) {
+//        key = secretKey;
+//    }
 
     public void verifyToken(String token) {
         // 토큰을 파싱해서 해당 토큰을 얻고, 토큰이 만료되었으면 에러 발생시킴
@@ -70,19 +84,5 @@ public class TokenService {
                                 .parseClaimsJws(token)
                                 .getBody()
                                 .get("uid"));
-    }
-
-    // login api 에 적용
-    public String jwtBuilder(Long id, String nickname) {
-        Claims claims = Jwts.claims();  // TODO claims 가 뭐지? -> jwt 의 payload 로, ~~
-        claims.put("nickname", nickname);
-        claims.put("uid", id);
-        Date now = new Date();
-        return Jwts.builder()
-                .setClaims(claims)
-                // TODO : 유효기간 설정은 다음 MVC에서 진행한다.
-                // .setExpiration(new Date(now.getTime() + accessTokenValidMillisecond))
-                .signWith(SignatureAlgorithm.HS256, key.getBytes())
-                .compact();
     }
 }
