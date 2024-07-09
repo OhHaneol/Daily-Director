@@ -39,10 +39,10 @@ public class TokenService {
                 .compact();
     }
 
-//    @Value("${jwt.secret.key}")
-//    public void getSecretKey(String secretKey) {
-//        key = secretKey;
-//    }
+    @Value("${jwt.secret.key}")
+    public void getSecretKey(String secretKey) {
+        key = secretKey;
+    }
 
     public void verifyToken(String token) {
         // 토큰을 파싱해서 해당 토큰을 얻고, 토큰이 만료되었으면 에러 발생시킴
