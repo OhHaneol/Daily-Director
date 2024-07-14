@@ -34,51 +34,70 @@ public class SearchService {
             AuthUser user,
             String searchKeyword) {
 
-        User findUser = userRepository
-                .findById(user.getId())
-                .orElseThrow(
-                        () -> new UserSignInvalidException(
-                                ErrorType.USER_NOT_FOUND_ERROR));
-
-        List<SearchResponse> searchResponseList = new ArrayList<>();
+        User findUser = getUserByUserId(user.getId());
 
         // 제목이 해당 키워드를 포함하고 있을 경우
-        List<Note> notesByTitle = noteRepository
-                .findByUser_IdAndTitleContaining(
-                        findUser.getId(),
-                        searchKeyword);
-
-        addResponse(notesByTitle, searchResponseList, "byTitle");
-
+        List<Note> notesByTitle = getNotesByUserIdAndTitle(findUser.getId(), searchKeyword);
+        List<SearchResponse> searchResponseListByTitle = addResponse(notesByTitle, "byTitle");
 
         // 내용이 해당 키워드를 포함하고 있을 경우
-        List<Note> notesByContent = noteRepository
-                .findByUser_IdAndContentsContaining(
-                        findUser.getId(),
-                        searchKeyword);
-
-        addResponse(notesByContent, searchResponseList, "byContent");
-
+        List<Note> notesByContent = getNotesByUserIdAndContent(findUser.getId(), searchKeyword);
+        List<SearchResponse> searchResponseListByContent = addResponse(notesByContent, "byContent");
 
         // 해시태그가 해당 키워드를 포함하고 있을 경우
-        List<Long> noteIds = new ArrayList<>();
-        hashtagService.getNoteByName(searchKeyword, noteIds);
-        List<Note> notesByHashtag = new ArrayList<>();
+        List<Note> notesByHashtag = getNotesByUserIdAndHashtag(findUser.getId(), searchKeyword);
+        List<SearchResponse> searchResponseListByHashtag = addResponse(notesByHashtag, "byHashtag");
 
-        for (Long nId : noteIds) {
-            notesByHashtag.add(
-                    noteRepository
-                            .findByUser_IdAndNoteId(
-                                    findUser.getId(),
-                                    nId));
-        }
-
-        addResponse(notesByHashtag, searchResponseList, "byHashtag");
+        List<SearchResponse> searchResponseList = new ArrayList<>();
+        searchResponseList.addAll(searchResponseListByTitle);
+        searchResponseList.addAll(searchResponseListByContent);
+        searchResponseList.addAll(searchResponseListByHashtag);
 
         return searchResponseList;
     }
 
-    private void addResponse(List<Note> notes, List<SearchResponse> searchResponseList, String keywordType) {
+    private User getUserByUserId(Long userId) {
+        User findUser = userRepository
+                .findById(userId)
+                .orElseThrow(
+                        () -> new UserSignInvalidException(
+                                ErrorType.USER_NOT_FOUND_ERROR));
+        return findUser;
+    }
+
+    private List<Note> getNotesByUserIdAndTitle(Long userId, String searchKeyword) {
+        List<Note> notesByTitle = noteRepository
+                .findByUser_IdAndTitleContaining(
+                        userId,
+                        searchKeyword);
+        return notesByTitle;
+    }
+
+    private List<Note> getNotesByUserIdAndContent(Long userId, String searchKeyword) {
+        List<Note> notesByContent = noteRepository
+                .findByUser_IdAndContentsContaining(
+                        userId,
+                        searchKeyword);
+        return notesByContent;
+    }
+
+    private List<Note> getNotesByUserIdAndHashtag(Long userId, String searchKeyword) {
+        List<Long> findNoteIds = hashtagService.getNoteIdsByNoteHashtagName(searchKeyword);
+        List<Note> notesByHashtag = new ArrayList<>();
+
+        for (Long nId : findNoteIds) {
+            notesByHashtag.add(
+                    noteRepository
+                            .findByUser_IdAndNoteId(
+                                    userId,
+                                    nId));
+        }
+        return notesByHashtag;
+    }
+
+    private List<SearchResponse> addResponse(List<Note> notes, String keywordType) {
+        List<SearchResponse> searchResponseList = new ArrayList<>();
+
         notes.stream()
                 .forEach(note -> searchResponseList.add(
                         new SearchResponse(
@@ -88,6 +107,8 @@ public class SearchService {
                                 note.getContents(),
                                 note.getCreatedAt(),
                                 note.getModifiedAt())));
+
+        return searchResponseList;
     }
 
 }

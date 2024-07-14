@@ -34,7 +34,7 @@ public class User extends BaseEntity {
     @Column(name = "nickname", unique = true)
     private String nickname;
 
-    @OneToMany(mappedBy = "user")
-    private List<Note> notes = new ArrayList<>();
+//    @OneToMany(mappedBy = "user")
+//    private List<Note> notes = new ArrayList<>();
 
 }
