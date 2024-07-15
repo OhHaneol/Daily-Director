@@ -17,7 +17,6 @@ import ohahsis.dailydirecter.user.domain.User;
 import ohahsis.dailydirecter.user.infrastructure.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -31,7 +30,6 @@ public class NoteService {
     private final NoteRepository noteRepository;
     private final UserRepository userRepository;
     private final HashtagService hashtagService;
-//    private final TransactionTemplate txTemplate;
 
     /**
      * 노트 생성
@@ -42,21 +40,13 @@ public class NoteService {
     @Transactional
     public NoteSaveResponse writeNote(AuthUser user, NoteRequest request) {
         // 제목과 내용이 모두 없는 경우
-        if (request.getTitle().isBlank() && request.getContents().stream().allMatch(Predicate.isEqual(""))) {
-            throw new NoteInvalidException(ErrorType.NOT_BOTH_BLANK_ERROR);
-        }
+        verifyTitleAndContents(request.getTitle(), request.getContents());
 
         // 기승전결 외 5개 이상의 문서 저장 요청이 온 경우
-        if (request.getContents().size() > CONTENTS_MAX_SIZE) {
-            throw new NoteInvalidException(ErrorType.CONTENTS_MAX_SIZE_4);
-        }
+        verifyContentsSize(request);
 
         // 노트 작성자
-        User noteUser = userRepository.findById(user.getId()).orElseThrow(  // TODO 해당 컨트롤러에 Auth 접근으로써 user 는 이미 확인되었는데, null 일 경우를 꼭 대비해야만 하나?
-                () -> new AuthLoginException(ErrorType.AUTHORIZATION_ERROR)
-        ); // 10초
-
-
+        User noteUser = getNoteUserByUserId(user.getId());
 
         // 노트 저장
         var note = Note.builder()   // 왜 builder 를 사용하는가? -> setter 는 어디서나 값을 수정할 수 있어서 객체지향적으로 좋지 못하다.
@@ -65,10 +55,6 @@ public class NoteService {
                 .title(request.getTitle())
                 .user(noteUser)
                 .build();
-
-        /*txTemplate.execute(
-                noteRepository.save(note)
-        );*/
         var savedNote = noteRepository.save(note);
 
         // TODO Service call Service
@@ -84,27 +70,22 @@ public class NoteService {
                 savedNote.getCreatedAt());
     }
 
+
     /**
      * 노트 수정
      * (해결?) 문제 1: 노트 작성자 이외의 사람도 노트에 대한 접근 및 수정이 가능함. -> 임시로 id 비교해서 막았는데, 이거면 충분할까? resolver 에서 token 으로 해야 하는 것?
      * 문제 2: 임시로 막은 코드의 중복이 심하다. resolver 등으로 옮기자!
      */
     @Transactional
-    public NoteSaveResponse editNote(AuthUser user, Long note_id, NoteRequest request) {
+    public NoteSaveResponse editNote(AuthUser user, Long noteId, NoteRequest request) {
 
-        Note findNote = noteRepository.findById(note_id).orElseThrow(
-                () -> new NoteInvalidException(ErrorType.NOTE_NOT_FOUND_ERROR)
-        );
+        Note findNote = getNoteByNoteId(noteId);
 
-        isWriter(user, findNote);
+        validateSameWriterById(user.getId(), findNote.getUser().getId());
 
-        findNote.setTitle(request.getTitle());
-        findNote.setStatus(request.getStatus());
-        findNote.setContents(request.getContents());
+        setFindNoteByRequest(findNote, request);
 
-        if(findNote.getTitle().isBlank() && findNote.getContents().stream().allMatch(Predicate.isEqual(""))) {
-            throw new NoteInvalidException(ErrorType.NOT_BOTH_BLANK_ERROR);
-        }
+        verifyTitleAndContents(findNote.getTitle(), findNote.getContents());
 
         List<String> savedNoteHashtagNames = hashtagService.saveNoteHashtag(findNote, request);
 
@@ -124,24 +105,19 @@ public class NoteService {
      * (해결) 문제 1: 해시태그를 response 에 보냈는데 보이지 않음. 수정 메서드에서도 마찬가지. -> note 에 같이 설정을 해줘야 함.
      */
     @Transactional(readOnly = true)
-    public NoteResponse getNote(AuthUser user, Long note_id) {
-        Note findNote = noteRepository.findById(note_id).orElseThrow(
-                () -> new NoteInvalidException(ErrorType.NOTE_NOT_FOUND_ERROR)
-        );
+    public NoteResponse getNote(AuthUser user, Long noteId) {
+        Note findNote = getNoteByNoteId(noteId);
 
-        isWriter(user, findNote);
+        validateSameWriterById(user.getId(), findNote.getUser().getId());
 
-        // 해시태그 이름 조회
-        List<String> noteHashtagNames = new ArrayList<>();
         // TODO Service call Service
-        hashtagService.getHashtagNames(findNote, noteHashtagNames);
+        List<String> noteHashtagNames = hashtagService.getHashtagNames(findNote);
 
         return new NoteResponse(
                 findNote.getContents(),
                 findNote.getStatus(),
                 findNote.getTitle(),
                 noteHashtagNames);
-
     }
 
     /**
@@ -150,23 +126,49 @@ public class NoteService {
      * (해결) 문제 2: Note.getUser() 가 null 이 나옴. 맵핑 하면 자연스럽게 해당 로그인으로 수행되는 게 아니었음 -> createNote 에 추가.
      */
     @Transactional
-    public SuccessResponse deleteNote(AuthUser user, Long note_id) {
-        Note findNote = noteRepository.findById(note_id).orElseThrow(
-                () -> new NoteInvalidException(ErrorType.NOTE_NOT_FOUND_ERROR)
-        );
+    public SuccessResponse deleteNote(AuthUser user, Long noteId) {
+        Note findNote = getNoteByNoteId(noteId);
 
-        isWriter(user, findNote);
+        validateSameWriterById(user.getId(), findNote.getUser().getId());
 
-        noteRepository.deleteById(note_id);
+        noteRepository.deleteById(noteId);
 
         return new SuccessResponse("성공적으로 삭제되었습니다.");
     }
 
-    /**
-     * note_id argument 를 이용한 외부인 접근 제한 메서드
-     */
-    private void isWriter(AuthUser user, Note findNote) {
-        if(!findNote.getUser().getId().equals(user.getId())) {
+
+    private void verifyTitleAndContents(String title, List<String> contents) {
+        if (title.isBlank() && contents.stream().allMatch(Predicate.isEqual(""))) {
+            throw new NoteInvalidException(ErrorType.NOT_BOTH_BLANK_ERROR);
+        }
+    }
+
+    private void verifyContentsSize(NoteRequest request) {
+        if (request.getContents().size() > CONTENTS_MAX_SIZE) {
+            throw new NoteInvalidException(ErrorType.CONTENTS_MAX_SIZE_4);
+        }
+    }
+
+    private User getNoteUserByUserId(Long userId) {
+        return userRepository.findById(userId).orElseThrow(  // TODO 해당 컨트롤러에 Auth 접근으로써 user 는 이미 확인되었는데, null 일 경우를 꼭 대비해야만 하나?
+                () -> new AuthLoginException(ErrorType.AUTHORIZATION_ERROR)
+        );
+    }
+
+    private Note getNoteByNoteId(Long noteId) {
+        return noteRepository.findById(noteId).orElseThrow(
+                () -> new NoteInvalidException(ErrorType.NOTE_NOT_FOUND_ERROR)
+        );
+    }
+
+    private void setFindNoteByRequest(Note findNote, NoteRequest request) {
+        findNote.setTitle(request.getTitle());
+        findNote.setStatus(request.getStatus());
+        findNote.setContents(request.getContents());
+    }
+
+    private void validateSameWriterById(Long userId, Long findNoteId) {
+        if (!findNoteId.equals(userId)) {
             throw new AuthLoginException(ErrorType.AUTHORIZATION_ERROR);
         }
     }
