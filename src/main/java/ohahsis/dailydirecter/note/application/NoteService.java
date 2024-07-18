@@ -17,7 +17,6 @@ import ohahsis.dailydirecter.user.domain.User;
 import ohahsis.dailydirecter.user.infrastructure.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionTemplate;
 
 import java.util.*;
 import java.util.function.Predicate;
@@ -40,12 +39,14 @@ public class NoteService {
      */
     @Transactional
     public NoteSaveResponse writeNote(AuthUser user, NoteRequest request) {
+
         isTitleAndContentExist(request);
         isContentCntUnderMaxSize(request);
 
         User noteUser = getWriter(user);
 
         Note note = getAndBuildNote(request, noteUser);
+
         var savedNote = noteRepository.save(note);
         // TODO Service call Service
         List<String> savedNoteHashtagNames = hashtagService.saveNoteHashtag(note, request);
@@ -64,15 +65,11 @@ public class NoteService {
     public NoteSaveResponse editNote(AuthUser user, Long note_id, NoteRequest request) {
         Note findNote = getFindNote(note_id);
 
-        isWriter(user, findNote);
+        validateSameWriterById(user.getId(), findNote.getUser().getId());
 
-        findNote.setTitle(request.getTitle());
-        findNote.setStatus(request.getStatus());
-        findNote.setContents(request.getContents());
+        setFindNoteByRequest(findNote, request);
 
-        if(findNote.getTitle().isBlank() && findNote.getContents().stream().allMatch(Predicate.isEqual(""))) {
-            throw new NoteInvalidException(ErrorType.NOT_BOTH_BLANK_ERROR);
-        }
+        verifyTitleAndContents(findNote.getTitle(), findNote.getContents());
 
         List<String> savedNoteHashtagNames = hashtagService.saveNoteHashtag(findNote, request);
 
@@ -92,24 +89,19 @@ public class NoteService {
      * (해결) 문제 1: 해시태그를 response 에 보냈는데 보이지 않음. 수정 메서드에서도 마찬가지. -> note 에 같이 설정을 해줘야 함.
      */
     @Transactional(readOnly = true)
-    public NoteResponse getNote(AuthUser user, Long note_id) {
-        Note findNote = noteRepository.findById(note_id).orElseThrow(
-                () -> new NoteInvalidException(ErrorType.NOTE_NOT_FOUND_ERROR)
-        );
+    public NoteResponse getNote(AuthUser user, Long noteId) {
+        Note findNote = getNoteByNoteId(noteId);
 
-        isWriter(user, findNote);
+        validateSameWriterById(user.getId(), findNote.getUser().getId());
 
-        // 해시태그 이름 조회
-        List<String> noteHashtagNames = new ArrayList<>();
         // TODO Service call Service
-        hashtagService.getHashtagNames(findNote, noteHashtagNames);
+        List<String> noteHashtagNames = hashtagService.getHashtagNames(findNote);
 
         return new NoteResponse(
                 findNote.getContents(),
                 findNote.getStatus(),
                 findNote.getTitle(),
                 noteHashtagNames);
-
     }
 
     /**
@@ -118,14 +110,12 @@ public class NoteService {
      * (해결) 문제 2: Note.getUser() 가 null 이 나옴. 맵핑 하면 자연스럽게 해당 로그인으로 수행되는 게 아니었음 -> createNote 에 추가.
      */
     @Transactional
-    public SuccessResponse deleteNote(AuthUser user, Long note_id) {
-        Note findNote = noteRepository.findById(note_id).orElseThrow(
-                () -> new NoteInvalidException(ErrorType.NOTE_NOT_FOUND_ERROR)
-        );
+    public SuccessResponse deleteNote(AuthUser user, Long noteId) {
+        Note findNote = getNoteByNoteId(noteId);
 
-        isWriter(user, findNote);
+        validateSameWriterById(user.getId(), findNote.getUser().getId());
 
-        noteRepository.deleteById(note_id);
+        noteRepository.deleteById(noteId);
 
         return new SuccessResponse("성공적으로 삭제되었습니다.");
     }
@@ -148,6 +138,7 @@ public class NoteService {
     }
 
     private void isContentCntUnderMaxSize(NoteRequest request) {
+
         if (request.getContents().size() > CONTENTS_MAX_SIZE) {
             throw new NoteInvalidException(ErrorType.CONTENTS_MAX_SIZE_4);
         }

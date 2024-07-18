@@ -28,7 +28,7 @@ public class Hashtag {
     @Column(name = "name", unique = true)
     private String name;
 
-    @OneToMany(mappedBy = "hashtag", cascade = CascadeType.ALL)
-    private Set<NoteHashtag> noteHashtags = new HashSet<>();
+//    @OneToMany(mappedBy = "hashtag", cascade = CascadeType.ALL)
+//    private Set<NoteHashtag> noteHashtags = new HashSet<>();
 
 }

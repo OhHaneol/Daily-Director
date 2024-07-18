@@ -62,6 +62,7 @@ public class HashtagService {
         Hashtag hashtag;
         hashtag = Hashtag.builder()
                 .name(name)
+
                 .build();
         hashtagRepository.save(hashtag);
         return hashtag;
@@ -86,15 +87,15 @@ public class HashtagService {
      */
     public void getHashtagNames(Note note, List<String> noteHashtagNames) {
 
+
         for (NoteHashtag noteHashtag : note.getNoteHashtags()) {
             noteHashtagNames.add(noteHashtag.getHashtag().getName());
         }
+        return noteHashtagNames;
     }
 
-    /**
-     * 키워드로 NoteHashtag 조회
-     */
-    public void getNoteByName(String noteHashtagName, List<Long> findNoteIds) {
+    public List<Long> getNoteIdsByNoteHashtagName(String noteHashtagName) {
+        List<Long> findNoteIds = new ArrayList<>();
         List<NoteHashtag> noteHashtags = noteHashtagRepository
                 .findByHashtag_NameContaining(noteHashtagName);
 
@@ -102,6 +103,8 @@ public class HashtagService {
                 noteHashtag -> findNoteIds.add(noteHashtag
                         .getNote()
                         .getNoteId()));
+
+        return findNoteIds;
     }
 
 }

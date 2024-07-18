@@ -49,10 +49,12 @@ public class SearchService {
         List<Note> notesByHashtag = getNotesByHashtag(findUser.getId(), searchKeyword);
         addResponse(notesByHashtag, searchResponseList, "byHashtag");
 
+
         return searchResponseList;
     }
 
     private User findUser(Long userId) {
+
         User findUser = userRepository
                 .findById(userId)
                 .orElseThrow(
@@ -62,6 +64,7 @@ public class SearchService {
     }
 
     private List<Note> getNotesByTitle(Long userId, String searchKeyword) {
+
         List<Note> notesByTitle = noteRepository
                 .findByUser_IdAndTitleContaining(
                         userId,
@@ -70,6 +73,7 @@ public class SearchService {
     }
 
     private List<Note> getNotesByContent(Long userId, String searchKeyword) {
+
         List<Note> notesByContent = noteRepository
                 .findByUser_IdAndContentsContaining(
                         userId,
@@ -81,9 +85,10 @@ public class SearchService {
         List<Long> noteIds = new ArrayList<>();
         // TODO : Service call Service
         hashtagService.getNoteByName(searchKeyword, noteIds);
+
         List<Note> notesByHashtag = new ArrayList<>();
 
-        for (Long nId : noteIds) {
+        for (Long nId : findNoteIds) {
             notesByHashtag.add(
                     noteRepository
                             .findByUser_IdAndNoteId(
@@ -93,7 +98,9 @@ public class SearchService {
         return notesByHashtag;
     }
 
-    private void addResponse(List<Note> notes, List<SearchResponse> searchResponseList, String keywordType) {
+    private List<SearchResponse> addResponse(List<Note> notes, String keywordType) {
+        List<SearchResponse> searchResponseList = new ArrayList<>();
+
         notes.stream()
                 .forEach(note -> searchResponseList.add(
                         new SearchResponse(
@@ -103,6 +110,8 @@ public class SearchService {
                                 note.getContents(),
                                 note.getCreatedAt(),
                                 note.getModifiedAt())));
+
+        return searchResponseList;
     }
 
 }

@@ -9,6 +9,7 @@ import ohahsis.dailydirecter.user.dto.response.UserSignupResponse;
 import ohahsis.dailydirecter.user.infrastructure.UserRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionTemplate;
 
 @Service
 @RequiredArgsConstructor
@@ -17,13 +18,8 @@ public class UserService {
 
     @Transactional
     public UserSignupResponse signup(UserSignupRequest request) {
-        if (userRepository.existsByEmail(request.getEmail())) {
-            throw new UserSignInvalidException(ErrorType.DUPLICATION_EMAIL_ERROR);
-        }
-
-        if (userRepository.existsByNickname(request.getNickname())) {
-            throw new UserSignInvalidException(ErrorType.DUPLICATION_NICKNAME_ERROR);
-        }
+        validateEmail(request.getEmail());
+        validateNickName(request.getNickname());
 
         var user =
                 User.builder()
@@ -36,5 +32,17 @@ public class UserService {
         var savedUser = userRepository.save(user);
 
         return new UserSignupResponse(savedUser.getId(), savedUser.getNickname());
+    }
+
+    private void validateEmail(String email) {
+        if (userRepository.existsByEmail(email)) {
+            throw new UserSignInvalidException(ErrorType.DUPLICATION_EMAIL_ERROR);
+        }
+    }
+
+    private void validateNickName(String nickName) {
+        if (userRepository.existsByNickname(nickName)) {
+            throw new UserSignInvalidException(ErrorType.DUPLICATION_NICKNAME_ERROR);
+        }
     }
 }
