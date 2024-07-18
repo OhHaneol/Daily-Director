@@ -10,7 +10,6 @@ import ohahsis.dailydirecter.hashtag.domain.NoteHashtag;
 import ohahsis.dailydirecter.note.dto.request.NoteRequest;
 import ohahsis.dailydirecter.hashtag.infrastructure.HashtagRepository;
 import ohahsis.dailydirecter.hashtag.infrastructure.NoteHashtagRepository;
-import ohahsis.dailydirecter.note.infrastructure.NoteRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -30,43 +29,56 @@ public class HashtagService {
      * NoteHashtag, Hashtag 저장
      */
     public List<String> saveNoteHashtag(Note note, NoteRequest request) {
-//        List<NoteHashtag> savedNoteHashtags = new ArrayList<>();
         List<String> savedNoteHashtagNames = new ArrayList<>();
 
-        // 해시태그가 전달되지 않았거나, 개수가 3개를 초과할 경우
-        if (request.getHashtagNames().size() > HASHTAGS_MAX_SIZE) {
-            throw new NoteInvalidException(
-                    ErrorType.HASHTAGS_MAX_SIZE_3);
-        }
+        isHashtagCntUnderMaxSize(request.getHashtagNames().size());
 
-        // 노트 해시태그 저장
         for (String name : request.getHashtagNames()) {
             Hashtag hashtag;
 
-            // 기존에 없던 hashtag 는 build
             if (!hashtagRepository.existsByName(name)) {
-                hashtag = Hashtag.builder()
-                        .name(name)
-                        .build();
-                hashtagRepository.save(hashtag);
-            } else {    // 존재하면 해당 해시태그를 가져옴.
-                hashtag = hashtagRepository.findByName(name);
+                hashtag = getAndSaveNewHashtag(name);
+            } else {
+                hashtag = getExistHashtag(name);
             }
 
-            // noteHashtag 를 build
-            var noteHashtag = NoteHashtag.builder()
-                    .note(note)
-                    .hashtag(hashtag)
-                    .build();
+            NoteHashtag noteHashtag = getAndBuildNoteHashtag(note, hashtag);
 
-//            savedNoteHashtags.add(noteHashtag);
             savedNoteHashtagNames.add(noteHashtag.getHashtag().getName());
-
             noteHashtagRepository.save(noteHashtag);
         }
-//        note.setNoteHashtags(savedNoteHashtags);
 
         return savedNoteHashtagNames;
+    }
+
+    private void isHashtagCntUnderMaxSize(int hashtagCnt) {
+        if (hashtagCnt > HASHTAGS_MAX_SIZE) {
+            throw new NoteInvalidException(
+                    ErrorType.HASHTAGS_MAX_SIZE_3);
+        }
+    }
+
+    private Hashtag getAndSaveNewHashtag(String name) {
+        Hashtag hashtag;
+        hashtag = Hashtag.builder()
+                .name(name)
+                .build();
+        hashtagRepository.save(hashtag);
+        return hashtag;
+    }
+
+    private Hashtag getExistHashtag(String name) {
+        Hashtag hashtag;
+        hashtag = hashtagRepository.findByName(name);
+        return hashtag;
+    }
+
+    private NoteHashtag getAndBuildNoteHashtag(Note note, Hashtag hashtag) {
+        var noteHashtag = NoteHashtag.builder()
+                .note(note)
+                .hashtag(hashtag)
+                .build();
+        return noteHashtag;
     }
 
     /**

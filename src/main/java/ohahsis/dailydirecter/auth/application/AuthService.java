@@ -15,8 +15,6 @@ public class AuthService {
     private final TokenService tokenService;
 
     public AuthLoginResponse login(AuthLoginRequest request) {
-//        var user = userRepository.findByEmailAndPassword(request.getEmail(), request.getPassword())
-//                .orElseThrow(() -> new AuthLoginException(ErrorType.FAIL_TO_LOGIN_ERROR));
 
         var user = userRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new AuthLoginException(ErrorType.USER_NOT_FOUND_ERROR));
