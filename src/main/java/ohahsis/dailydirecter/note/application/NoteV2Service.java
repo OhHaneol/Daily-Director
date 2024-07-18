@@ -33,17 +33,11 @@
 //    private final HashtagService hashtagService;
 ////    private final TransactionTemplate txTemplate;
 //
-//    /**
-//     * 노트 생성
-//     * TODO : SRP 지키기. 생성하는 게 책임인데, 유효성 조회 생성 모두가 섞여 있음. 이를 쪼개야 함.
-//     * 1. 메서드 분리
-//     * 2. 트랜잭션이 필요한 곳에서만 메서드 넣어주기.
-//     */
 //    public NoteSaveResponse writeNote(AuthUser user, NoteRequest request) {
 //        validate(request);
 //
 //        // 노트 작성자
-//        User noteUser = userRepository.findById(user.getId()).orElseThrow(  // TODO 해당 컨트롤러에 Auth 접근으로써 user 는 이미 확인되었는데, null 일 경우를 꼭 대비해야만 하나?
+//        User noteUser = userRepository.findById(user.getId()).orElseThrow(
 //                () -> new AuthLoginException(ErrorType.AUTHORIZATION_ERROR)
 //        ); // 10초
 //
@@ -58,7 +52,6 @@
 //        txTemplate.execute(
 //                var savedNote = noteRepository.save(note);
 //
-//        // TODO Service call Service
 //        List<String> savedNoteHashtagNames = hashtagService.saveNoteHashtag(note, request);
 //        )
 //

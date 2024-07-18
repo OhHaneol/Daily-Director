@@ -44,6 +44,4 @@ public class HomeController {
         var response = noteListService.getNoteList(user, status);
         return ResponseDto.ok(response);
     }
-
-    // TODO 회원 정보, 새로운 노트 추가 버튼 관련해서 어떤 게 필요한지 조사
 }

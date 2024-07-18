@@ -31,24 +31,19 @@ public class HashtagService {
     public List<String> saveNoteHashtag(Note note, NoteRequest request) {
         List<String> savedNoteHashtagNames = new ArrayList<>();
 
-        verifyHashtagByMaxSize(request.getHashtagNames().size());
+        isHashtagCntUnderMaxSize(request.getHashtagNames().size());
 
-        // 노트 해시태그 저장
-        for (String hashtagName : request.getHashtagNames()) {
+        for (String name : request.getHashtagNames()) {
             Hashtag hashtag;
 
-            // 기존에 없던 hashtag 는 build
-            if (!hashtagRepository.existsByName(hashtagName)) {
-                hashtag = buildAndSaveHashtag(hashtagName);
-            } else {    // 존재하면 해당 해시태그를 가져옴.
-                hashtag = hashtagRepository.findByName(hashtagName);
+            if (!hashtagRepository.existsByName(name)) {
+                hashtag = getAndSaveNewHashtag(name);
+            } else {
+                hashtag = getExistHashtag(name);
             }
 
-            // noteHashtag 를 build
-            var noteHashtag = NoteHashtag.builder()
-                    .note(note)
-                    .hashtag(hashtag)
-                    .build();
+            NoteHashtag noteHashtag = getAndBuildNoteHashtag(note, hashtag);
+
             savedNoteHashtagNames.add(noteHashtag.getHashtag().getName());
             noteHashtagRepository.save(noteHashtag);
         }
@@ -56,25 +51,42 @@ public class HashtagService {
         return savedNoteHashtagNames;
     }
 
-    private Hashtag buildAndSaveHashtag(String hashtagName) {
-        Hashtag hashtag;
-        hashtag = Hashtag.builder()
-                .name(hashtagName)
-                .build();
-        hashtagRepository.save(hashtag);
-        return hashtag;
-    }
-
-    private void verifyHashtagByMaxSize(int hashtagsSize) {
-        if (hashtagsSize > HASHTAGS_MAX_SIZE) {
+    private void isHashtagCntUnderMaxSize(int hashtagCnt) {
+        if (hashtagCnt > HASHTAGS_MAX_SIZE) {
             throw new NoteInvalidException(
                     ErrorType.HASHTAGS_MAX_SIZE_3);
         }
     }
 
-    public List<String> getHashtagNames(Note note) {
+    private Hashtag getAndSaveNewHashtag(String name) {
+        Hashtag hashtag;
+        hashtag = Hashtag.builder()
+                .name(name)
 
-        List<String> noteHashtagNames = new ArrayList<>();
+                .build();
+        hashtagRepository.save(hashtag);
+        return hashtag;
+    }
+
+    private Hashtag getExistHashtag(String name) {
+        Hashtag hashtag;
+        hashtag = hashtagRepository.findByName(name);
+        return hashtag;
+    }
+
+    private NoteHashtag getAndBuildNoteHashtag(Note note, Hashtag hashtag) {
+        var noteHashtag = NoteHashtag.builder()
+                .note(note)
+                .hashtag(hashtag)
+                .build();
+        return noteHashtag;
+    }
+
+    /**
+     * Note 로 Hashtag 이름 출력
+     */
+    public void getHashtagNames(Note note, List<String> noteHashtagNames) {
+
 
         for (NoteHashtag noteHashtag : note.getNoteHashtags()) {
             noteHashtagNames.add(noteHashtag.getHashtag().getName());

@@ -33,30 +33,28 @@ public class SearchService {
     public List<SearchResponse> searchKeyword(
             AuthUser user,
             String searchKeyword) {
-
-        User findUser = getUserByUserId(user.getId());
-
-        // 제목이 해당 키워드를 포함하고 있을 경우
-        List<Note> notesByTitle = getNotesByUserIdAndTitle(findUser.getId(), searchKeyword);
-        List<SearchResponse> searchResponseListByTitle = addResponse(notesByTitle, "byTitle");
-
-        // 내용이 해당 키워드를 포함하고 있을 경우
-        List<Note> notesByContent = getNotesByUserIdAndContent(findUser.getId(), searchKeyword);
-        List<SearchResponse> searchResponseListByContent = addResponse(notesByContent, "byContent");
-
-        // 해시태그가 해당 키워드를 포함하고 있을 경우
-        List<Note> notesByHashtag = getNotesByUserIdAndHashtag(findUser.getId(), searchKeyword);
-        List<SearchResponse> searchResponseListByHashtag = addResponse(notesByHashtag, "byHashtag");
+        User findUser = findUser(user.getId());
 
         List<SearchResponse> searchResponseList = new ArrayList<>();
-        searchResponseList.addAll(searchResponseListByTitle);
-        searchResponseList.addAll(searchResponseListByContent);
-        searchResponseList.addAll(searchResponseListByHashtag);
+
+        // 제목이 해당 키워드를 포함하고 있을 경우
+        List<Note> notesByTitle = getNotesByTitle(findUser.getId(), searchKeyword);
+        addResponse(notesByTitle, searchResponseList, "byTitle");
+
+        // 내용이 해당 키워드를 포함하고 있을 경우
+        List<Note> notesByContent = getNotesByContent(findUser.getId(), searchKeyword);
+        addResponse(notesByContent, searchResponseList, "byContent");
+
+        // 해시태그가 해당 키워드를 포함하고 있을 경우
+        List<Note> notesByHashtag = getNotesByHashtag(findUser.getId(), searchKeyword);
+        addResponse(notesByHashtag, searchResponseList, "byHashtag");
+
 
         return searchResponseList;
     }
 
-    private User getUserByUserId(Long userId) {
+    private User findUser(Long userId) {
+
         User findUser = userRepository
                 .findById(userId)
                 .orElseThrow(
@@ -65,7 +63,8 @@ public class SearchService {
         return findUser;
     }
 
-    private List<Note> getNotesByUserIdAndTitle(Long userId, String searchKeyword) {
+    private List<Note> getNotesByTitle(Long userId, String searchKeyword) {
+
         List<Note> notesByTitle = noteRepository
                 .findByUser_IdAndTitleContaining(
                         userId,
@@ -73,7 +72,8 @@ public class SearchService {
         return notesByTitle;
     }
 
-    private List<Note> getNotesByUserIdAndContent(Long userId, String searchKeyword) {
+    private List<Note> getNotesByContent(Long userId, String searchKeyword) {
+
         List<Note> notesByContent = noteRepository
                 .findByUser_IdAndContentsContaining(
                         userId,
@@ -81,8 +81,11 @@ public class SearchService {
         return notesByContent;
     }
 
-    private List<Note> getNotesByUserIdAndHashtag(Long userId, String searchKeyword) {
-        List<Long> findNoteIds = hashtagService.getNoteIdsByNoteHashtagName(searchKeyword);
+    private List<Note> getNotesByHashtag(Long userId, String searchKeyword) {
+        List<Long> noteIds = new ArrayList<>();
+        // TODO : Service call Service
+        hashtagService.getNoteByName(searchKeyword, noteIds);
+
         List<Note> notesByHashtag = new ArrayList<>();
 
         for (Long nId : findNoteIds) {
