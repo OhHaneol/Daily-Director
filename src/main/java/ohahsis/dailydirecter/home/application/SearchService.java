@@ -39,15 +39,15 @@ public class SearchService {
 
         // 제목이 해당 키워드를 포함하고 있을 경우
         List<Note> notesByTitle = getNotesByTitle(findUser.getId(), searchKeyword);
-        addResponse(notesByTitle, searchResponseList, "byTitle");
+        searchResponseList.addAll(addResponse(notesByTitle, "byTitle"));
 
         // 내용이 해당 키워드를 포함하고 있을 경우
         List<Note> notesByContent = getNotesByContent(findUser.getId(), searchKeyword);
-        addResponse(notesByContent, searchResponseList, "byContent");
+        searchResponseList.addAll(addResponse(notesByContent, "byContent"));
 
         // 해시태그가 해당 키워드를 포함하고 있을 경우
         List<Note> notesByHashtag = getNotesByHashtag(findUser.getId(), searchKeyword);
-        addResponse(notesByHashtag, searchResponseList, "byHashtag");
+        searchResponseList.addAll(addResponse(notesByHashtag, "byHashtag"));
 
 
         return searchResponseList;
@@ -82,9 +82,8 @@ public class SearchService {
     }
 
     private List<Note> getNotesByHashtag(Long userId, String searchKeyword) {
-        List<Long> noteIds = new ArrayList<>();
         // TODO : Service call Service
-        hashtagService.getNoteByName(searchKeyword, noteIds);
+        List<Long> findNoteIds = hashtagService.getNoteIdsByNoteHashtagName(searchKeyword);
 
         List<Note> notesByHashtag = new ArrayList<>();
 

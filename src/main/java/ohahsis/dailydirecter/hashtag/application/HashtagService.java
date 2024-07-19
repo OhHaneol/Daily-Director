@@ -33,6 +33,8 @@ public class HashtagService {
 
         isHashtagCntUnderMaxSize(request.getHashtagNames().size());
 
+//        noteHashtagRepository.deleteByNote(note);
+
         for (String name : request.getHashtagNames()) {
             Hashtag hashtag;
 
@@ -84,10 +86,10 @@ public class HashtagService {
 
     /**
      * Note 로 Hashtag 이름 출력
+     * @return
      */
-    public void getHashtagNames(Note note, List<String> noteHashtagNames) {
-
-
+    public List<String> getHashtagNames(Note note) {
+        List<String> noteHashtagNames = new ArrayList<>();
         for (NoteHashtag noteHashtag : note.getNoteHashtags()) {
             noteHashtagNames.add(noteHashtag.getHashtag().getName());
         }
