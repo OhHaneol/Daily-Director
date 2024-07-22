@@ -7,6 +7,7 @@ import ohahsis.dailydirecter.note.domain.Note;
 @Getter
 @Entity
 @Builder
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "note_hashtag")

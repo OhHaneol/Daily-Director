@@ -24,13 +24,10 @@ input {
     height: 40px;
 
 }
-
+/*
 #logo {
     display: flex;
     height: 60px;
-    /*
-    margin-left: 125px;
-    */
     width: 140px;
     float: left;
 
@@ -40,23 +37,20 @@ input {
         width: 140px;
     }
 }
+*/
 #note-save-btn {
     background: none;
     border: none;
 
     height: 60px;
-    margin-left: 125px;
+    margin-left: 119px;
     width: 140px;
 
-    /*
-    float: right;
-    margin-top: 18px;
-    margin-right: 11px;
-
     img {
-        width: 27px;
-        opacity: 80%;
-    }*/
+        padding-top: 10px;
+        opacity: 90%;
+        width: 140px;
+    }
 }
 #note-delete-btn {
     background: none;
@@ -67,7 +61,7 @@ input {
     margin-right: 11px;
 
     img {
-        width: 27px;
+        width: 25px;
         opacity: 80%;
     }
 }

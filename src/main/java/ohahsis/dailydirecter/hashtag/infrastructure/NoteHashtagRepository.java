@@ -16,6 +16,6 @@ public interface NoteHashtagRepository extends JpaRepository<NoteHashtag, Long> 
     // 원하는 키워드를 포함하는 해시태그를, FK 로 갖고 있는 Hashtag 테이블의 Name 필드를 이용해서 찾는다.
     List<NoteHashtag> findByHashtag_NameContaining(String hashtagName);
 
-//    void deleteByNote(Note note);
+    void deleteAllByNote(Note note);
 
 }

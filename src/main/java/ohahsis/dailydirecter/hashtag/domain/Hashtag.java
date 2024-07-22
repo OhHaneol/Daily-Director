@@ -1,10 +1,7 @@
 package ohahsis.dailydirecter.hashtag.domain;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -12,6 +9,7 @@ import java.util.Set;
 @Data
 @Entity
 @Builder
+@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "hashtag")
@@ -28,7 +26,11 @@ public class Hashtag {
     @Column(name = "name", unique = true)
     private String name;
 
-//    @OneToMany(mappedBy = "hashtag", cascade = CascadeType.ALL)
-//    private Set<NoteHashtag> noteHashtags = new HashSet<>();
+//    // TODO 개수 0이면 사라지는 로직 이곳에 추가
+//    @Column(name = "cnt")
+//    private int cnt;
+
+    @OneToMany(mappedBy = "hashtag", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<NoteHashtag> noteHashtags = new HashSet<>();
 
 }
