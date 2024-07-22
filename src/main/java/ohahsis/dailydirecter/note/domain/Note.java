@@ -4,13 +4,16 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 import ohahsis.dailydirecter.common.entity.BaseEntity;
+import ohahsis.dailydirecter.hashtag.domain.Hashtag;
 import ohahsis.dailydirecter.hashtag.domain.NoteHashtag;
 import ohahsis.dailydirecter.user.domain.User;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-@Getter @Setter
+@Getter
+@Setter
 @Entity
 @Builder
 @NoArgsConstructor
@@ -39,6 +42,22 @@ public class Note extends BaseEntity {
     @JoinColumn(name = "id")
     private User user;
 
-    @OneToMany(mappedBy = "note", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "note", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<NoteHashtag> noteHashtags = new ArrayList<>();
+
+    public void removeNoteHashtag(NoteHashtag noteHashtag) {
+        noteHashtags.remove(noteHashtag);
+        noteHashtag.setNote(null);
+    }
+
+    public void deleteAllNoteHashtags() {
+        for (NoteHashtag noteHashtag : new ArrayList<>(noteHashtags)) {
+            removeNoteHashtag(noteHashtag);
+        }
+    }
+
+    public void addNoteHashtag(NoteHashtag noteHashtag) {
+        noteHashtags.add(noteHashtag);
+        noteHashtag.setNote(this);
+    }
 }

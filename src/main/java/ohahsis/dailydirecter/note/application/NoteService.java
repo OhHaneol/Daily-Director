@@ -40,7 +40,7 @@ public class NoteService {
     @Transactional
     public NoteSaveResponse writeNote(AuthUser user, NoteRequest request) {
 
-        isTitleAndContentExist(request);
+        isTitleAndContentExist(request.getTitle(), request.getContents());
         isContentCntUnderMaxSize(request);
 
         User noteUser = getWriter(user);
@@ -63,13 +63,13 @@ public class NoteService {
 
     @Transactional
     public NoteSaveResponse editNote(AuthUser user, Long note_id, NoteRequest request) {
-        Note findNote = getFindNote(note_id);
+        Note findNote = getNoteByNoteId(note_id);
 
-        validateSameWriterById(user.getId(), findNote.getUser().getId());
+        validateSameWriterById(user, findNote);
 
-        setFindNoteByRequest(findNote, request);
+        setFindNoteByRequest(request, findNote);
 
-        verifyTitleAndContents(findNote.getTitle(), findNote.getContents());
+        isTitleAndContentExist(findNote.getTitle(), findNote.getContents());
 
         List<String> savedNoteHashtagNames = hashtagService.saveNoteHashtag(findNote, request);
 
@@ -84,6 +84,12 @@ public class NoteService {
         );
     }
 
+    private void setFindNoteByRequest(NoteRequest request, Note findNote) {
+        findNote.setTitle(request.getTitle());
+        findNote.setContents(request.getContents());
+        findNote.setStatus(request.getStatus());
+    }
+
     /**
      * 노트 하나 읽기
      * (해결) 문제 1: 해시태그를 response 에 보냈는데 보이지 않음. 수정 메서드에서도 마찬가지. -> note 에 같이 설정을 해줘야 함.
@@ -92,7 +98,7 @@ public class NoteService {
     public NoteResponse getNote(AuthUser user, Long noteId) {
         Note findNote = getNoteByNoteId(noteId);
 
-        validateSameWriterById(user.getId(), findNote.getUser().getId());
+        validateSameWriterById(user, findNote);
 
         // TODO Service call Service
         List<String> noteHashtagNames = hashtagService.getHashtagNames(findNote);
@@ -113,11 +119,18 @@ public class NoteService {
     public SuccessResponse deleteNote(AuthUser user, Long noteId) {
         Note findNote = getNoteByNoteId(noteId);
 
-        validateSameWriterById(user.getId(), findNote.getUser().getId());
+        validateSameWriterById(user, findNote);
 
         noteRepository.deleteById(noteId);
 
         return new SuccessResponse("성공적으로 삭제되었습니다.");
+    }
+
+    private Note getNoteByNoteId(Long noteId) {
+        Note findNote = noteRepository.findById(noteId).orElseThrow(
+                () -> new NoteInvalidException(ErrorType.NOTE_NOT_FOUND_ERROR)
+        );
+        return findNote;
     }
 
     private Note getAndBuildNote(NoteRequest request, User noteUser) {
@@ -138,14 +151,13 @@ public class NoteService {
     }
 
     private void isContentCntUnderMaxSize(NoteRequest request) {
-
         if (request.getContents().size() > CONTENTS_MAX_SIZE) {
             throw new NoteInvalidException(ErrorType.CONTENTS_MAX_SIZE_4);
         }
     }
 
-    private void isTitleAndContentExist(NoteRequest request) {
-        if (request.getTitle().isBlank() && request.getContents().stream().allMatch(Predicate.isEqual(""))) {
+    private void isTitleAndContentExist(String title, List<String> contents) {
+        if (title.isBlank() && contents.stream().allMatch(Predicate.isEqual(""))) {
             throw new NoteInvalidException(ErrorType.NOT_BOTH_BLANK_ERROR);
         }
     }
@@ -153,16 +165,9 @@ public class NoteService {
     /**
      * note_id argument 를 이용한 외부인 접근 제한 메서드
      */
-    private void isWriter(AuthUser user, Note findNote) {
+    private void validateSameWriterById(AuthUser user, Note findNote) {
         if(!findNote.getUser().getId().equals(user.getId())) {
             throw new AuthLoginException(ErrorType.AUTHORIZATION_ERROR);
         }
-    }
-
-    private Note getFindNote(Long note_id) {
-        Note findNote = noteRepository.findById(note_id).orElseThrow(
-                () -> new NoteInvalidException(ErrorType.NOTE_NOT_FOUND_ERROR)
-        );
-        return findNote;
     }
 }
