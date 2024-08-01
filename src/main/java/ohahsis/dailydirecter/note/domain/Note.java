@@ -45,19 +45,19 @@ public class Note extends BaseEntity {
     @OneToMany(mappedBy = "note", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<NoteHashtag> noteHashtags = new ArrayList<>();
 
-    public void removeNoteHashtag(NoteHashtag noteHashtag) {
-        noteHashtags.remove(noteHashtag);
-        noteHashtag.setNote(null);
-    }
 
-    public void deleteAllNoteHashtags() {
-        for (NoteHashtag noteHashtag : new ArrayList<>(noteHashtags)) {
-            removeNoteHashtag(noteHashtag);
-        }
-    }
-
-    public void addNoteHashtag(NoteHashtag noteHashtag) {
-        noteHashtags.add(noteHashtag);
-        noteHashtag.setNote(this);
-    }
+//    public void deleteAllNoteHashtags() {
+//        for (NoteHashtag noteHashtag : new ArrayList<>(noteHashtags)) {
+//            removeNoteHashtag(noteHashtag);
+//        }
+//    }
+//    public void removeNoteHashtag(NoteHashtag noteHashtag) {
+//        noteHashtags.remove(noteHashtag);
+//        noteHashtag.setNote(null);
+//    }
+//
+//    public void addNoteHashtag(NoteHashtag noteHashtag) {
+//        noteHashtags.add(noteHashtag);
+//        noteHashtag.setNote(this);
+//    }
 }

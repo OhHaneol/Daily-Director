@@ -5,9 +5,9 @@ spring:
     multipart:
       enabled: true
   datasource:
-    url: jdbc:mysql://localhost:3306/dailyDirector
-    username: root
-    password: 1234
+    url: jdbc:mysql://localhost:3306/dailydirector
+    username: haneol
+    password: haneol123
     driver-class-name: com.mysql.cj.jdbc.Driver
   mvc:
     pathmatch:
@@ -29,7 +29,7 @@ spring:
 
 
 server:
-#  port: 8080
+  port: 8080
   tomcat:
     connection-timeout: 30000
 #    max-threads: 100

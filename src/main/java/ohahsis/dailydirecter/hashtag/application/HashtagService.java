@@ -201,7 +201,7 @@ public class HashtagService {
         //  2. deleteByNotInHastagIdAndNoteId(List<Long> id)
         // where ! in(2,3,4) and note_id = 22 (새로 요청 들어온 해시태그 제외하고 ㅇ기존 지움)
 
-        note.deleteAllNoteHashtags();
+//        note.deleteAllNoteHashtags();
         note = noteRepository.save(note);
 
 
@@ -211,7 +211,7 @@ public class HashtagService {
             NoteHashtag noteHashtag = getAndBuildNoteHashtag(note, hashtag);
 
 
-            note.addNoteHashtag(noteHashtag); // Note와 NoteHashtag 간의 양방향 관계 설정
+//            note.addNoteHashtag(noteHashtag); // Note와 NoteHashtag 간의 양방향 관계 설정
 
 
             savedNoteHashtagNames.add(noteHashtag.getHashtag().getName());
