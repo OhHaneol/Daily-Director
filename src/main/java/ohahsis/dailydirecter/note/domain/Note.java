@@ -38,12 +38,14 @@ public class Note extends BaseEntity {
     @ElementCollection  // 컬렉션 객체임을 jpa 에 알려주는 어노테이션
     private List<String> contents = new ArrayList<>();
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "id")
-    private User user;
+//    @ManyToOne(fetch = FetchType.LAZY)
+//    @JoinColumn(name = "id")
+//    private User user;
+    @Column(name = "user_id")
+    private Long userId;
 
-    @OneToMany(mappedBy = "note", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<NoteHashtag> noteHashtags = new ArrayList<>();
+//    @OneToMany(mappedBy = "note", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private List<NoteHashtag> noteHashtags = new ArrayList<>();
 
 
 //    public void deleteAllNoteHashtags() {

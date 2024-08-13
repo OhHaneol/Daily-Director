@@ -30,7 +30,7 @@ public class Hashtag {
 //    @Column(name = "cnt")
 //    private int cnt;
 
-    @OneToMany(mappedBy = "hashtag", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<NoteHashtag> noteHashtags = new HashSet<>();
+//    @OneToMany(mappedBy = "hashtag", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private Set<NoteHashtag> noteHashtags = new HashSet<>();
 
 }
