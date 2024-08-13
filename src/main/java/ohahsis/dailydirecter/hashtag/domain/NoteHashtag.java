@@ -15,7 +15,7 @@ public class NoteHashtag {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "note_hashtag_id")
+    @Column(name = "id")
     private Long noteHashtagId;
 
     // NoteHashtag 여러 개가 Note 에 맵핑됨. 근데 여기서 이 ToOne 인 Note 가 null 이 될 수 있다는 말!

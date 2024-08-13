@@ -27,7 +27,7 @@ public class Note extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "note_id")
+    @Column(name = "id")
     private Long noteId;    // 필드명에 언더바는 되도록 피하자. jpa 메서드에서 문제가 생긴다.
 
     private String title;
@@ -46,8 +46,9 @@ public class Note extends BaseEntity {
 
 //    @OneToMany(mappedBy = "note", cascade = CascadeType.ALL, orphanRemoval = true)
 //    private List<NoteHashtag> noteHashtags = new ArrayList<>();
-    @ElementCollection
-    private List<Long> noteHashtagIds = new ArrayList<>();
+//    @ElementCollection
+//    @Column(name = "note_hashtag_ids")
+//    private List<Long> noteHashtagIds = new ArrayList<>();
 
 
 //    public void deleteAllNoteHashtags() {
