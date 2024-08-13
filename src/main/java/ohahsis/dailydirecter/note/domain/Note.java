@@ -46,6 +46,8 @@ public class Note extends BaseEntity {
 
 //    @OneToMany(mappedBy = "note", cascade = CascadeType.ALL, orphanRemoval = true)
 //    private List<NoteHashtag> noteHashtags = new ArrayList<>();
+    @ElementCollection
+    private List<Long> noteHashtagIds = new ArrayList<>();
 
 
 //    public void deleteAllNoteHashtags() {

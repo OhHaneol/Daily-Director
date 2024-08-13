@@ -32,5 +32,7 @@ public class Hashtag {
 
 //    @OneToMany(mappedBy = "hashtag", cascade = CascadeType.ALL, orphanRemoval = true)
 //    private Set<NoteHashtag> noteHashtags = new HashSet<>();
+    @ElementCollection
+    private Set<Long> noteHashtagIds = new HashSet<>();
 
 }
