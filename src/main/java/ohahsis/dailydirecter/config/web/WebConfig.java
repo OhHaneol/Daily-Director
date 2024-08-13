@@ -16,8 +16,7 @@ public class WebConfig implements WebMvcConfigurer {
     private final UserArgumentResolver userArgumentResolver;
 
     // HandlerMethodArgumentResolver 등록을 위해서는 WebMvcConfigurer 를 구현한 클래스가 필요하다.
-    //그리고 addArgumentResolvers()라는 메소드를 구현해야 한다.
-
+    // 그리고 addArgumentResolvers() 라는 메소드를 구현해야 한다.
 
     @Override
     public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {

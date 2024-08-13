@@ -24,9 +24,9 @@ public class HomeController {
     private final SearchService searchService;
     private final NoteListService noteListService;
 
-    // (해결) 토큰으로 검증된 사용자라도, 다른 사람의 노트에 접근할 수가 있음.
-    //      감독 버전에서는 자신의 노트에만 접근하도록 하는 로직 모듈화가 필요하다.
-    //      -> JPA find 메서드에 User 조건을 추가해서 해결!
+    // 토큰으로 검증된 사용자라도, 다른 사람의 노트에 접근할 수가 있음.
+    // -> 감독 버전에서는 자신의 노트에만 접근하도록 하는 로직 모듈화가 필요하다.
+    // -> JPA find 메서드에 User 조건을 추가해서 해결!
 
     @Operation(summary = "노트 검색")
     @Parameter(name = "searchKeyword", description = "검색어", required = true)

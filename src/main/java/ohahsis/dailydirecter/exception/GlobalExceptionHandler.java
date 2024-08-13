@@ -16,10 +16,10 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(BusinessException.class)
     protected ResponseEntity<ErrorDto> handleBusinessException(
-            final BusinessException e) { // 왜 final로?
+            final BusinessException e) {
         log.error("[ERROR] BusinessException -> {}", e.getMessage());
         return ResponseEntity.status(e.getErrorType().getStatus())
-                .body(new ErrorDto(e.getErrorType()));  // body 에 ErrorType 을 담은 dto 전달?
+                .body(new ErrorDto(e.getErrorType()));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

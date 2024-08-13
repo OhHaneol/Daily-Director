@@ -92,7 +92,7 @@ public class NoteService {
     }
 
     /**
-     * 노트 하나 읽기 (해결) 문제 1: 해시태그를 response 에 보냈는데 보이지 않음. 수정 메서드에서도 마찬가지. -> note 에 같이 설정을 해줘야 함.
+     * 노트 하나 읽기
      */
     @Transactional(readOnly = true)
     public NoteResponse getNote(AuthUser user, Long noteId) {
@@ -111,9 +111,7 @@ public class NoteService {
     }
 
     /**
-     * 노트 삭제 (해결) 문제 1: 영속성 때문인지 deleteById 가 실행되지 않고 있음 -> 영속성... 때문은 아닌 것 같고, 노트와 해시태그를 잘 저장해준 뒤
-     * 실행하니 정상 삭제가 되었음. (해결) 문제 2: Note.getUser() 가 null 이 나옴. 맵핑 하면 자연스럽게 해당 로그인으로 수행되는 게 아니었음 ->
-     * createNote 에 추가.
+     * 노트 삭제
      */
     @Transactional
     public SuccessResponse deleteNote(AuthUser user, Long noteId) {

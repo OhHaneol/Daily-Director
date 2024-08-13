@@ -32,7 +32,7 @@ public class UserArgumentResolver implements HandlerMethodArgumentResolver {
     }
 
     @Override
-    public Object resolveArgument(                                  // 개념: 매개변수로 넣어줄 값을 제공한다.
+    public Object resolveArgument(          // 개념: 매개변수로 넣어줄 값을 제공한다.
             MethodParameter parameter, ModelAndViewContainer mavContainer,
             NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
         var httpServletRequest = (HttpServletRequest) webRequest.getNativeRequest();
@@ -53,9 +53,8 @@ public class UserArgumentResolver implements HandlerMethodArgumentResolver {
 
         var token = new AuthToken(accessToken);
 
-        // (해결) request 의 헤더에 token 이 없어서 accessToken 이 null 이라 "" 을 넣은 경우, 밑에 tokenService 에서는 AuthUser 객체 반환이 되지 않는건가? -> yes
+        // request 의 헤더에 token 이 없어서 accessToken 이 null 이라 "" 을 넣은 경우, 밑에 tokenService 에서는 AuthUser 객체 반환이 되지 않는건가? -> yes
         // 그럼 이 resolver 는 null 을 반환하고, 그럼 controller 에서 예외가 발생하게 되나? -> no, controller 에서 해당 resolver 로 가고, tokenService 의 getAuthUser 의 verifyToken 에서 예외 발생!
-
         return tokenService.getAuthUser(
                 token);                     // 사용: token 을 통해 얻은 AuthUser 객체를 반환한다.
     }
