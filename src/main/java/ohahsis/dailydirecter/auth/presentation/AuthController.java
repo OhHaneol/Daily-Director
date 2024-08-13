@@ -13,6 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import static ohahsis.dailydirecter.auth.AuthConstants.AUTH_TOKEN_HEADER_KEY;
 import static ohahsis.dailydirecter.common.CrossOriginConstants.CROSS_ORIGIN_ADDRESS;
 
 @CrossOrigin(origins = CROSS_ORIGIN_ADDRESS)
@@ -34,4 +35,11 @@ public class AuthController {
         var response = authService.login(request);
         return ResponseDto.ok(response);
     }
+
+//    @Operation(summary = "로그아웃")
+//    @PostMapping("/logout")
+//    public ResponseEntity<?> logout(@RequestHeader(AUTH_TOKEN_HEADER_KEY) String token) {
+//        authService.logout(token);
+//        return ResponseDto.ok("Successfully logged out");
+//    }
 }
