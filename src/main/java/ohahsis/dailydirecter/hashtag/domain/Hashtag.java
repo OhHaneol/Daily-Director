@@ -20,7 +20,7 @@ public class Hashtag {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "hashtag_id")
+    @Column(name = "id")
     private Long hashtagId;
 
     @Column(name = "name", unique = true)
@@ -30,7 +30,10 @@ public class Hashtag {
 //    @Column(name = "cnt")
 //    private int cnt;
 
-    @OneToMany(mappedBy = "hashtag", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<NoteHashtag> noteHashtags = new HashSet<>();
+//    @OneToMany(mappedBy = "hashtag", cascade = CascadeType.ALL, orphanRemoval = true)
+//    private Set<NoteHashtag> noteHashtags = new HashSet<>();
+//    @ElementCollection
+//    @Column(name = "note_hashtag_ids")
+//    private Set<Long> noteHashtagIds = new HashSet<>();
 
 }
