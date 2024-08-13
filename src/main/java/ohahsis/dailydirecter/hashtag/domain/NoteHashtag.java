@@ -4,10 +4,9 @@ import jakarta.persistence.*;
 import lombok.*;
 import ohahsis.dailydirecter.note.domain.Note;
 
-@Getter
 @Entity
+@Getter
 @Builder
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "note_hashtag")
@@ -28,7 +27,7 @@ public class NoteHashtag {
     private Long noteId;
 
 
-//    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    //    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
 //    @JoinColumn(name = "hashtag_id")
 ////    @Size(max = 3)
 //    private Hashtag hashtag;

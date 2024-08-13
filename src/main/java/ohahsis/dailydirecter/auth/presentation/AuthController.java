@@ -21,6 +21,7 @@ import static ohahsis.dailydirecter.common.CrossOriginConstants.CROSS_ORIGIN_ADD
 @RequestMapping(path = "/api/auth", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 public class AuthController {
+
     private final AuthService authService;
 
     @Operation(summary = "로그인")

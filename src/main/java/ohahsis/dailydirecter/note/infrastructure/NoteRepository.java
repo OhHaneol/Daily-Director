@@ -15,7 +15,7 @@ public interface NoteRepository extends JpaRepository<Note, Long> {
 
     // 로그인한 사용자가 작성한 노트 중에서 조건에 따라 조회
 
-//    List<Note> findByUser_IdAndTitleContaining(Long userId, String keyword);
+    //    List<Note> findByUser_IdAndTitleContaining(Long userId, String keyword);
 //    List<Note> findByUserIdAndTitleContaining(Long userId, String keyword);
     List<Note> findByUserId(Long userId);
 

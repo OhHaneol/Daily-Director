@@ -20,6 +20,7 @@ import static ohahsis.dailydirecter.common.CrossOriginConstants.CROSS_ORIGIN_ADD
 @RequestMapping(path = "/api/home", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 public class HomeController {
+
     private final SearchService searchService;
     private final NoteListService noteListService;
 

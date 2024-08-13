@@ -280,11 +280,13 @@ public class HashtagService {
     }
 
     private Hashtag getHashtag(Long hashtagId) {
-        return hashtagRepository.findById(hashtagId).orElseThrow(() -> new HashtagInvalidException(ErrorType.HASHTAG_NOT_FOUND_ERROR));
+        return hashtagRepository.findById(hashtagId)
+                .orElseThrow(() -> new HashtagInvalidException(ErrorType.HASHTAG_NOT_FOUND_ERROR));
     }
 
     private Note getNote(Long noteId) {
-        return noteRepository.findById(noteId).orElseThrow(() -> new NoteInvalidException(ErrorType.NOTE_NOT_FOUND_ERROR));
+        return noteRepository.findById(noteId)
+                .orElseThrow(() -> new NoteInvalidException(ErrorType.NOTE_NOT_FOUND_ERROR));
     }
 
     // 해시태그 이름을 이용해서 노트를 찾는 메서드
@@ -297,7 +299,8 @@ public class HashtagService {
 //                hashtag  -> hashtag.getNoteHashtagIds().forEach(noteHashtagId -> noteHashtags.add(getNoteHashtag(noteHashtagId)))
 //        );
         hashtags.stream().forEach(
-                hashtag  -> noteHashtagRepository.findByHashtagId(hashtag.getHashtagId()).forEach(noteHashtag -> noteHashtags.add(noteHashtag))
+                hashtag -> noteHashtagRepository.findByHashtagId(hashtag.getHashtagId())
+                        .forEach(noteHashtag -> noteHashtags.add(noteHashtag))
         );
 //        List<NoteHashtag> noteHashtags =
 //                noteHashtagRepository

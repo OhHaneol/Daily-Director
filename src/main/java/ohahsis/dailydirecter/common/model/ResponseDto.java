@@ -13,6 +13,7 @@ import java.io.Serializable;
 @AllArgsConstructor
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class ResponseDto<T> implements Serializable {
+
     private T data;
 
     public static <T> ResponseEntity<ResponseDto<T>> ok(T data) {

@@ -20,6 +20,7 @@ import static ohahsis.dailydirecter.common.CrossOriginConstants.CROSS_ORIGIN_ADD
 @RequestMapping(path = "/api/users", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 public class UserController {
+
     private final UserService userService;
 
     @Operation(summary = "회원가입")

@@ -15,14 +15,16 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(BusinessException.class)
-    protected ResponseEntity<ErrorDto> handleBusinessException(final BusinessException e) { // 왜 final로?
+    protected ResponseEntity<ErrorDto> handleBusinessException(
+            final BusinessException e) { // 왜 final로?
         log.error("[ERROR] BusinessException -> {}", e.getMessage());
         return ResponseEntity.status(e.getErrorType().getStatus())
                 .body(new ErrorDto(e.getErrorType()));  // body 에 ErrorType 을 담은 dto 전달?
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    protected ResponseEntity<FieldInvalidResponse> handleFieldException(final MethodArgumentNotValidException e) {
+    protected ResponseEntity<FieldInvalidResponse> handleFieldException(
+            final MethodArgumentNotValidException e) {
         BindingResult bindingResult = e.getBindingResult();
         return ResponseEntity
                 .status(HttpStatus.BAD_REQUEST)

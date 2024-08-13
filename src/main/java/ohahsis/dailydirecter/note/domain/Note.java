@@ -12,9 +12,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-@Getter
-@Setter
 @Entity
+@Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -38,31 +37,12 @@ public class Note extends BaseEntity {
     @ElementCollection  // 컬렉션 객체임을 jpa 에 알려주는 어노테이션
     private List<String> contents = new ArrayList<>();
 
-//    @ManyToOne(fetch = FetchType.LAZY)
-//    @JoinColumn(name = "id")
-//    private User user;
     @Column(name = "user_id")
     private Long userId;
 
-//    @OneToMany(mappedBy = "note", cascade = CascadeType.ALL, orphanRemoval = true)
-//    private List<NoteHashtag> noteHashtags = new ArrayList<>();
-//    @ElementCollection
-//    @Column(name = "note_hashtag_ids")
-//    private List<Long> noteHashtagIds = new ArrayList<>();
-
-
-//    public void deleteAllNoteHashtags() {
-//        for (NoteHashtag noteHashtag : new ArrayList<>(noteHashtags)) {
-//            removeNoteHashtag(noteHashtag);
-//        }
-//    }
-//    public void removeNoteHashtag(NoteHashtag noteHashtag) {
-//        noteHashtags.remove(noteHashtag);
-//        noteHashtag.setNote(null);
-//    }
-//
-//    public void addNoteHashtag(NoteHashtag noteHashtag) {
-//        noteHashtags.add(noteHashtag);
-//        noteHashtag.setNote(this);
-//    }
+    public void update(String title, Boolean status, List<String> contents) {
+        this.title = title;
+        this.status = status;
+        this.contents = contents;
+    }
 }

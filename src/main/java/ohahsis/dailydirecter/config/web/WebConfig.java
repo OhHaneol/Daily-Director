@@ -12,6 +12,7 @@ import java.util.List;
 @Configuration
 @RequiredArgsConstructor
 public class WebConfig implements WebMvcConfigurer {
+
     private final UserArgumentResolver userArgumentResolver;
 
     // HandlerMethodArgumentResolver 등록을 위해서는 WebMvcConfigurer 를 구현한 클래스가 필요하다.

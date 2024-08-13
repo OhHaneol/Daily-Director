@@ -6,10 +6,9 @@ import lombok.*;
 import java.util.HashSet;
 import java.util.Set;
 
-@Data
 @Entity
+@Getter
 @Builder
-@Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "hashtag")
