@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Predicate;
 
 @Slf4j
 @Service
@@ -54,47 +55,25 @@ public class SearchService {
     }
 
     private User findUser(Long userId) {
-
-        User findUser = userRepository
+        return userRepository
                 .findById(userId)
                 .orElseThrow(
                         () -> new UserSignInvalidException(
                                 ErrorType.USER_NOT_FOUND_ERROR));
-        return findUser;
     }
 
     private List<Note> getNotesByTitle(Long userId, String searchKeyword) {
-
-        List<Note> notesByTitle = noteRepository
-                .findByUser_IdAndTitleContaining(
-                        userId,
-                        searchKeyword);
-        return notesByTitle;
+        return noteRepository.findByUserId(userId).stream().filter(note -> note.getTitle().contains(searchKeyword)).toList();
     }
 
     private List<Note> getNotesByContent(Long userId, String searchKeyword) {
-
-        List<Note> notesByContent = noteRepository
-                .findByUser_IdAndContentsContaining(
-                        userId,
-                        searchKeyword);
-        return notesByContent;
+        return noteRepository.findByUserId(userId).stream().filter(note -> note.getContents().stream().anyMatch(noteContent -> noteContent.contains(searchKeyword))).toList();
     }
 
     private List<Note> getNotesByHashtag(Long userId, String searchKeyword) {
         // TODO : Service call Service
-        List<Long> findNoteIds = hashtagService.getNoteIdsByNoteHashtagName(searchKeyword);
-
-        List<Note> notesByHashtag = new ArrayList<>();
-
-        for (Long nId : findNoteIds) {
-            notesByHashtag.add(
-                    noteRepository
-                            .findByUser_IdAndNoteId(
-                                    userId,
-                                    nId));
-        }
-        return notesByHashtag;
+        List<Note> notesByHashtag = hashtagService.getNotesByNoteHashtagName(searchKeyword);
+        return notesByHashtag.stream().filter(note -> note.getUserId().equals(userId)).toList();
     }
 
     private List<SearchResponse> addResponse(List<Note> notes, String keywordType) {

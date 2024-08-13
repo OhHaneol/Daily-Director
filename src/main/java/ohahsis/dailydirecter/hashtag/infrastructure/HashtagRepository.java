@@ -1,6 +1,7 @@
 package ohahsis.dailydirecter.hashtag.infrastructure;
 
 import ohahsis.dailydirecter.hashtag.domain.Hashtag;
+import ohahsis.dailydirecter.hashtag.domain.NoteHashtag;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,4 +15,7 @@ public interface HashtagRepository extends JpaRepository<Hashtag, Long> {
     Boolean existsByName(String name);
 
     Hashtag findByName(String name);
+
+    List<Hashtag> findByNameContaining(String hashtagName);
+
 }

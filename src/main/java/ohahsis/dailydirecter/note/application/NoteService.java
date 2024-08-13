@@ -7,6 +7,7 @@ import ohahsis.dailydirecter.common.dto.SuccessResponse;
 import ohahsis.dailydirecter.exception.login.AuthLoginException;
 import ohahsis.dailydirecter.exception.note.NoteInvalidException;
 import ohahsis.dailydirecter.hashtag.application.HashtagService;
+import ohahsis.dailydirecter.hashtag.infrastructure.NoteHashtagRepository;
 import ohahsis.dailydirecter.note.domain.Note;
 import ohahsis.dailydirecter.note.dto.request.NoteRequest;
 import ohahsis.dailydirecter.note.dto.response.NoteResponse;
@@ -57,7 +58,7 @@ public class NoteService {
                 savedNote.getStatus(),
                 savedNote.getTitle(),
                 savedNoteHashtagNames,
-                savedNote.getUser().getId(),
+                savedNote.getUserId(),
                 savedNote.getCreatedAt());
     }
 
@@ -138,7 +139,7 @@ public class NoteService {
                 .contents(request.getContents())
                 .status(request.getStatus())
                 .title(request.getTitle())
-                .user(noteUser)
+                .userId(noteUser.getId())
                 .build();
         return note;
     }
@@ -166,7 +167,7 @@ public class NoteService {
      * note_id argument 를 이용한 외부인 접근 제한 메서드
      */
     private void validateSameWriterById(AuthUser user, Note findNote) {
-        if(!findNote.getUser().getId().equals(user.getId())) {
+        if(!findNote.getUserId().equals(user.getId())) {
             throw new AuthLoginException(ErrorType.AUTHORIZATION_ERROR);
         }
     }
