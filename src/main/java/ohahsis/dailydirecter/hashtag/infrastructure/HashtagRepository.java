@@ -11,6 +11,7 @@ import java.util.List;
 @Repository
 @Transactional(readOnly = true)
 public interface HashtagRepository extends JpaRepository<Hashtag, Long> {
+
     @Transactional
     Boolean existsByName(String name);
 

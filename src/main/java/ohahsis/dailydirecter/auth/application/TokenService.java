@@ -22,6 +22,7 @@ import static ohahsis.dailydirecter.auth.AuthConstants.AUTH_TOKEN_HEADER_KEY;
 @Component
 @RequiredArgsConstructor
 public class TokenService {
+
     private final UserRepository userRepository;
     private String key;
 
@@ -52,7 +53,8 @@ public class TokenService {
             if (e.getMessage().contains("JWT expired")) {   // JWT expired : 토큰 만료 에러 처리
                 throw new AuthorizationException(ErrorType.AUTHORIZATION_ERROR);
             }
-            throw new IllegalArgumentException(ErrorType.NULL_TOKEN.getMessage());  // IllegalArgumentException 은 parseClaimsJws 의 예외 처리
+            throw new IllegalArgumentException(
+                    ErrorType.NULL_TOKEN.getMessage());  // IllegalArgumentException 은 parseClaimsJws 의 예외 처리
         }
 
         // TODO token 을 이용한 로그인의 경우 DB 조회를 줄이는 게 장점인데, 밑에서 userRepository 를 통해 DB 조회가 일어난다. 왜지?
@@ -76,7 +78,8 @@ public class TokenService {
         return new AuthUser(id);
     }
 
-    public Long getUserIdFromToken(String token) {  // TODO 대충 보면 jwt 를 파싱해서 body(??)에 담긴 uid 를 반환하는 것 같은데, jwt 의 payload 를 말하는 건지... 잘 모르겠음.
+    public Long getUserIdFromToken(
+            String token) {  // TODO 대충 보면 jwt 를 파싱해서 body(??)에 담긴 uid 를 반환하는 것 같은데, jwt 의 payload 를 말하는 건지... 잘 모르겠음.
         return Long.valueOf(
                 (Integer)
                         Jwts.parser()

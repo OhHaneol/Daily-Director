@@ -22,6 +22,7 @@ import java.util.function.Predicate;
 @Service
 @RequiredArgsConstructor
 public class SearchService {
+
     private final NoteRepository noteRepository;
     private final UserRepository userRepository;
     private final HashtagService hashtagService;
@@ -50,7 +51,6 @@ public class SearchService {
         List<Note> notesByHashtag = getNotesByHashtag(findUser.getId(), searchKeyword);
         searchResponseList.addAll(addResponse(notesByHashtag, "byHashtag"));
 
-
         return searchResponseList;
     }
 
@@ -63,11 +63,14 @@ public class SearchService {
     }
 
     private List<Note> getNotesByTitle(Long userId, String searchKeyword) {
-        return noteRepository.findByUserId(userId).stream().filter(note -> note.getTitle().contains(searchKeyword)).toList();
+        return noteRepository.findByUserId(userId).stream()
+                .filter(note -> note.getTitle().contains(searchKeyword)).toList();
     }
 
     private List<Note> getNotesByContent(Long userId, String searchKeyword) {
-        return noteRepository.findByUserId(userId).stream().filter(note -> note.getContents().stream().anyMatch(noteContent -> noteContent.contains(searchKeyword))).toList();
+        return noteRepository.findByUserId(userId).stream()
+                .filter(note -> note.getContents().stream()
+                        .anyMatch(noteContent -> noteContent.contains(searchKeyword))).toList();
     }
 
     private List<Note> getNotesByHashtag(Long userId, String searchKeyword) {

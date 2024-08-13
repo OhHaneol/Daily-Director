@@ -199,23 +199,12 @@ public class HashtagService {
 
         isHashtagCntUnderMaxSize(request.getHashtagNames().size());
 
-        // TODO NoteHashtag 의 개수를 3개로 맞추는 것.
-        //  1. 비교 후 없는 것만 삭제
-        //  2. deleteByNotInHastagIdAndNoteId(List<Long> id)
-        // where ! in(2,3,4) and note_id = 22 (새로 요청 들어온 해시태그 제외하고 ㅇ기존 지움)
-
-//        note.deleteAllNoteHashtags();
-//        note = noteRepository.save(note);
         noteHashtagRepository.deleteAllByNoteId(note.getNoteId());
 
         for (String name : request.getHashtagNames()) {
             Hashtag hashtag = getAndSaveHashtag(name);
 
             NoteHashtag noteHashtag = getAndBuildNoteHashtag(note, hashtag);
-
-//            note.addNoteHashtag(noteHashtag); // Note와 NoteHashtag 간의 양방향 관계 설정
-
-//            savedNoteHashtagNames.add(getHashtag(noteHashtag.getHashtagId()).getName());
             savedNoteHashtagNames.add(hashtag.getName());
 
             noteHashtagRepository.save(noteHashtag);
@@ -266,8 +255,6 @@ public class HashtagService {
 
     /**
      * Note 로 Hashtag 이름 출력
-     *
-     * @return
      */
     public List<String> getHashtagNames(Note note) {
         List<String> noteHashtagNames = new ArrayList<>();
@@ -280,28 +267,26 @@ public class HashtagService {
     }
 
     private Hashtag getHashtag(Long hashtagId) {
-        return hashtagRepository.findById(hashtagId).orElseThrow(() -> new HashtagInvalidException(ErrorType.HASHTAG_NOT_FOUND_ERROR));
+        return hashtagRepository.findById(hashtagId)
+                .orElseThrow(() -> new HashtagInvalidException(ErrorType.HASHTAG_NOT_FOUND_ERROR));
     }
 
     private Note getNote(Long noteId) {
-        return noteRepository.findById(noteId).orElseThrow(() -> new NoteInvalidException(ErrorType.NOTE_NOT_FOUND_ERROR));
+        return noteRepository.findById(noteId)
+                .orElseThrow(() -> new NoteInvalidException(ErrorType.NOTE_NOT_FOUND_ERROR));
     }
 
-    // 해시태그 이름을 이용해서 노트를 찾는 메서드
-    //
+    /**
+     * 해시태그 이름을 이용해서 노트를 찾는 메서드
+     */
     public List<Note> getNotesByNoteHashtagName(String noteHashtagName) {
         List<Note> findNotes = new ArrayList<>();
         List<Hashtag> hashtags = hashtagRepository.findByNameContaining(noteHashtagName);
         List<NoteHashtag> noteHashtags = new ArrayList<>();
-//        hashtags.stream().forEach(
-//                hashtag  -> hashtag.getNoteHashtagIds().forEach(noteHashtagId -> noteHashtags.add(getNoteHashtag(noteHashtagId)))
-//        );
         hashtags.stream().forEach(
-                hashtag  -> noteHashtagRepository.findByHashtagId(hashtag.getHashtagId()).forEach(noteHashtag -> noteHashtags.add(noteHashtag))
+                hashtag -> noteHashtagRepository.findByHashtagId(hashtag.getHashtagId())
+                        .forEach(noteHashtag -> noteHashtags.add(noteHashtag))
         );
-//        List<NoteHashtag> noteHashtags =
-//                noteHashtagRepository
-//                        .findByHashtagId_NameContaining(noteHashtagName);
 
         noteHashtags.stream().forEach(
                 noteHashtag -> findNotes.add(getNote(noteHashtag.getNoteId())));

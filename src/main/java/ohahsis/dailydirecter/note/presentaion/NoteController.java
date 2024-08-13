@@ -24,6 +24,7 @@ import static ohahsis.dailydirecter.common.CrossOriginConstants.CROSS_ORIGIN_ADD
 @RequestMapping(path = "/api/notes", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 public class NoteController {
+
     private final NoteService noteService;
 
     @Operation(summary = "노트 생성")
