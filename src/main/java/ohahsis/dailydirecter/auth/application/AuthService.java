@@ -27,9 +27,9 @@ public class AuthService {
         return new AuthLoginResponse(user.getNickname(), token);
     }
 
-//    public void logout(String token) {
-//        tokenService.logout(token);
-//    }
+    public void logout(String token) {
+        tokenService.logout(token);
+    }
 
     private User getUserByEmail(String email) {
         var user = userRepository.findByEmail(email)

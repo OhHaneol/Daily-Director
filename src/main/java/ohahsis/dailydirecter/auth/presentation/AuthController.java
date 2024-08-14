@@ -7,8 +7,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import ohahsis.dailydirecter.auth.application.AuthService;
 import ohahsis.dailydirecter.auth.dto.request.AuthLoginRequest;
-import ohahsis.dailydirecter.auth.dto.response.AuthLoginResponse;
 import ohahsis.dailydirecter.common.model.ResponseDto;
+import ohahsis.dailydirecter.exception.login.AuthLoginException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,14 +33,23 @@ public class AuthController {
     })
     @PostMapping("/login")
     public ResponseEntity<?> login(@RequestBody AuthLoginRequest request) {
-        var response = authService.login(request);
-        return ResponseDto.ok(response);
+//        var response = authService.login(request);
+//        return ResponseDto.ok(response);
+        try {
+            var response = authService.login(request);
+            return ResponseDto.ok(response);
+        } catch (AuthLoginException e) {
+            return ResponseDto.error(e.getErrorType());
+        } catch (Exception e) {
+            return ResponseDto.error(HttpStatus.INTERNAL_SERVER_ERROR, "INTERNAL_SERVER_ERROR",
+                    "예기치 못한 오류가 발생했습니다.");
+        }
     }
 
-//    @Operation(summary = "로그아웃")
-//    @PostMapping("/logout")
-//    public ResponseEntity<?> logout(@RequestHeader(AUTH_TOKEN_HEADER_KEY) String token) {
-//        authService.logout(token);
-//        return ResponseDto.ok("Successfully logged out");
-//    }
+    @Operation(summary = "로그아웃")
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@RequestHeader(AUTH_TOKEN_HEADER_KEY) String token) {
+        authService.logout(token);
+        return ResponseDto.ok("Successfully logged out");
+    }
 }
