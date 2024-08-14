@@ -3,6 +3,8 @@ package ohahsis.dailydirecter.auth.application;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
 
 import lombok.extern.slf4j.Slf4j;
@@ -16,8 +18,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.Date;
 
-import static ohahsis.dailydirecter.auth.AuthConstants.AUTH_TOKEN_HEADER_KEY;
-
 @Slf4j
 @Component
 @RequiredArgsConstructor
@@ -25,6 +25,7 @@ public class TokenService {
 
     private final UserRepository userRepository;
     private String key;
+    private final Set<String> blacklistedTokens = ConcurrentHashMap.newKeySet();
 
     // login api 에 적용
     public String jwtBuilder(Long id, String nickname) {
@@ -46,6 +47,9 @@ public class TokenService {
     }
 
     public void verifyToken(String token) {
+        if (isTokenBlacklisted(token)) {
+            throw new AuthorizationException(ErrorType.TOKEN_BLACKLISTED);
+        }
         // 토큰을 파싱해서 해당 토큰을 얻고, 토큰이 만료되었으면 에러 발생시킴
         try {
             Jwts.parser().setSigningKey(key.getBytes()).parseClaimsJws(token);
@@ -87,5 +91,25 @@ public class TokenService {
                                 .parseClaimsJws(token)
                                 .getBody()
                                 .get("uid"));
+    }
+
+
+    public void logout(String token) {
+        if (token != null && token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        }
+
+        try {
+            verifyToken(token);
+            blacklistedTokens.add(token);
+            log.info("Token blacklisted: {}", token);
+        } catch (Exception e) {
+            log.error("Error during logout", e);
+            throw new AuthorizationException(ErrorType.AUTHORIZATION_ERROR);
+        }
+    }
+
+    public boolean isTokenBlacklisted(String token) {
+        return blacklistedTokens.contains(token);
     }
 }
