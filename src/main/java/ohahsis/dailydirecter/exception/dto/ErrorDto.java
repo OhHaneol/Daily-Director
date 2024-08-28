@@ -8,6 +8,7 @@ import java.io.Serializable;
 @Slf4j
 @Getter
 public class ErrorDto implements Serializable {
+
     private final String message;
     private final String reason;
 

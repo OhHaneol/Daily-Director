@@ -9,6 +9,7 @@ import java.util.List;
 @Data
 @AllArgsConstructor
 public class NoteSaveResponse {
+
     private Long note_id;
     private List<String> content;
     private Boolean status;

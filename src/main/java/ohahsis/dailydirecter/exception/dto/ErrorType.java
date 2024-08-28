@@ -16,6 +16,12 @@ public enum ErrorType {
     HASHTAGS_MAX_SIZE_3(HttpStatus.BAD_REQUEST, "해시태그는 최대 3개까지 등록 가능합니다."),
     NOT_BOTH_BLANK_ERROR(HttpStatus.BAD_REQUEST, "제목과 내용 둘 다 빈 문자열일 수 없습니다."),
 
+    // 해시태그 오류
+    HASHTAG_NOT_FOUND_ERROR(HttpStatus.NOT_FOUND, "id에 해당하는 해시태그가 존재하지 않습니다."),
+
+    // 노트 해시태그 오류
+    NOTE_HASHTAG_NOT_FOUND_ERROR(HttpStatus.NOT_FOUND, "id에 해당하는 노트 해시태그가 존재하지 않습니다."),
+
     // 회원가입 오류
     DUPLICATION_EMAIL_ERROR(HttpStatus.BAD_REQUEST, "중복된 이메일 입니다."),
     DUPLICATION_NICKNAME_ERROR(HttpStatus.BAD_REQUEST, "중복된 닉네임 입니다."),
@@ -28,8 +34,8 @@ public enum ErrorType {
     // 토큰 오류
     AUTHORIZATION_ERROR(HttpStatus.UNAUTHORIZED, "인증, 인가 오류"),
     EXPIRED_TOKEN(HttpStatus.BAD_REQUEST, "해당 토큰은 만료된 토큰입니다."),
-    NULL_TOKEN(HttpStatus.UNAUTHORIZED, "access token 이 존재하지 않습니다.")
-    ;
+    NULL_TOKEN(HttpStatus.UNAUTHORIZED, "access token 이 존재하지 않습니다."),
+    TOKEN_BLACKLISTED(HttpStatus.BAD_REQUEST, "해당 토큰은 이미 로그아웃 되었습니다.");
 
     private final HttpStatus status;
     private final String message;

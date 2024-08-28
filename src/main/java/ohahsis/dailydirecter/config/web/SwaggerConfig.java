@@ -42,10 +42,9 @@ public class SwaggerConfig {
                 .security(List.of(new SecurityRequirement().addList(AUTH_TOKEN_HEADER_KEY)))
                 .info(swaggerInfo());
     }
+
     private Info swaggerInfo() {
         License license = new License();
-//        license.url(GITHUB_URL);
-//        license.setName(SERVER_NAME);
         return new Info().title("Daily Director").description("일상 감독").license(license);
     }
 }

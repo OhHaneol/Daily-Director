@@ -1,13 +1,15 @@
 spring:
+  application:
+    name: daily director
   profiles:
     include: secret
   servlet:
     multipart:
       enabled: true
   datasource:
-    url: jdbc:mysql://localhost:3306/dailyDirector
-    username: root
-    password: 1234
+    url: jdbc:mysql://localhost:3306/dailydirector
+    username: haneol
+    password: haneol123
     driver-class-name: com.mysql.cj.jdbc.Driver
   mvc:
     pathmatch:
@@ -29,7 +31,7 @@ spring:
 
 
 server:
-#  port: 8080
+  port: 8080
   tomcat:
     connection-timeout: 30000
 #    max-threads: 100
@@ -41,7 +43,6 @@ server:
 jwt:
   secret:
     key: 47362e25dda1b5e90d840d741d8b59f573852175df08a8e7d1b8ce9a234ccfd8c6d1d72331eee73b6e429a6c987ef9529daa16696bdc9d6f2c7d429b73ff812a
-# TODO static 변수 등록 어디에 하나?
 
 logging:
   level:

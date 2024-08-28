@@ -14,6 +14,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 public class NoteListService {
+
     private final NoteRepository noteRepository;
 
     /**
@@ -29,10 +30,8 @@ public class NoteListService {
     }
 
     private List<Note> getNotesByStatus(AuthUser user, boolean status) {
-        List<Note> notesByStatus = noteRepository.findByUser_IdAndStatus(
-                user.getId(),
-                status);
-        return notesByStatus;
+        return noteRepository.findByUserId(user.getId()).stream()
+                .filter(n -> n.getStatus().equals(status)).toList();
     }
 
     private List<NoteListResponse> getNoteListResponsesByNoteStatus(List<Note> notesByStatus) {

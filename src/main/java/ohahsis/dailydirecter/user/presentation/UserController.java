@@ -12,12 +12,15 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@CrossOrigin(origins = "http://localhost:63342")
+import static ohahsis.dailydirecter.common.CrossOriginConstants.CROSS_ORIGIN_ADDRESS;
+
+@CrossOrigin(origins = CROSS_ORIGIN_ADDRESS)
 @Tag(name = "사용자 관리")
 @RestController
 @RequestMapping(path = "/api/users", produces = MediaType.APPLICATION_JSON_VALUE)
 @RequiredArgsConstructor
 public class UserController {
+
     private final UserService userService;
 
     @Operation(summary = "회원가입")

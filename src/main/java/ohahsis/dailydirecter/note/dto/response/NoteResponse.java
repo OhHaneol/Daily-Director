@@ -8,6 +8,7 @@ import java.util.List;
 @Getter
 @AllArgsConstructor
 public class NoteResponse {
+
     private List<String> contents;
     private Boolean status;
     private String title;

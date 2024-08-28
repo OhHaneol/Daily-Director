@@ -19,26 +19,31 @@ import static ohahsis.dailydirecter.auth.AuthConstants.AUTH_TOKEN_HEADER_KEY;
 @Component
 @RequiredArgsConstructor
 public class UserArgumentResolver implements HandlerMethodArgumentResolver {
-    private final TokenService tokenService;
 
+    private final TokenService tokenService;
 
     // 파라미터 타입에 AuthUser 가 있으면 잡아채서 동작하는 resolver!
 
     @Override
-    public boolean supportsParameter(MethodParameter parameter) {   // 개념: 해당 메서드의 매개변수에 대해, 해당 resolver 가 지원하는 것인지를 체크한다.
-        return parameter.getParameterType().equals(AuthUser.class); // 사용: 파라미터가 AuthUser.class 를 가지고 있으면 true 를, 아니면 false 를 반환
+    public boolean supportsParameter(
+            MethodParameter parameter) {   // 개념: 해당 메서드의 매개변수에 대해, 해당 resolver 가 지원하는 것인지를 체크한다.
+        return parameter.getParameterType()
+                .equals(AuthUser.class); // 사용: 파라미터가 AuthUser.class 를 가지고 있으면 true 를, 아니면 false 를 반환
     }
 
     @Override
-    public Object resolveArgument(                                  // 개념: 매개변수로 넣어줄 값을 제공한다.
-            MethodParameter parameter, ModelAndViewContainer mavContainer, NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
+    public Object resolveArgument(          // 개념: 매개변수로 넣어줄 값을 제공한다.
+            MethodParameter parameter, ModelAndViewContainer mavContainer,
+            NativeWebRequest webRequest, WebDataBinderFactory binderFactory) throws Exception {
         var httpServletRequest = (HttpServletRequest) webRequest.getNativeRequest();
 
-        var accessToken = httpServletRequest.getHeader(AUTH_TOKEN_HEADER_KEY);  // request 의 헤더에서 토큰을 꺼낸다.
+        var accessToken = httpServletRequest.getHeader(
+                AUTH_TOKEN_HEADER_KEY);  // request 의 헤더에서 토큰을 꺼낸다.
 
         log.info(httpServletRequest.getHeader(AUTH_TOKEN_HEADER_KEY));
 
-        if (accessToken == null) {  // 헤더에서 토큰 받아오려 했더니 토큰이 없음, 로그인을 하면 무조건 토큰을 주는데, 토큰이 없다는 뜻은... 로그인을 하지 않았다?
+        if (accessToken
+                == null) {  // 헤더에서 토큰 받아오려 했더니 토큰이 없음, 로그인을 하면 무조건 토큰을 주는데, 토큰이 없다는 뜻은... 로그인을 하지 않았다?
             if (parameter.isOptional()) {   // 토큰을 아직 받지 않은 게 아니라 회원정보가 없다는 뜻인가? TODO isOptional() 이 뭐지?
                 return null;
             }
@@ -48,9 +53,9 @@ public class UserArgumentResolver implements HandlerMethodArgumentResolver {
 
         var token = new AuthToken(accessToken);
 
-        // (해결) request 의 헤더에 token 이 없어서 accessToken 이 null 이라 "" 을 넣은 경우, 밑에 tokenService 에서는 AuthUser 객체 반환이 되지 않는건가? -> yes
+        // request 의 헤더에 token 이 없어서 accessToken 이 null 이라 "" 을 넣은 경우, 밑에 tokenService 에서는 AuthUser 객체 반환이 되지 않는건가? -> yes
         // 그럼 이 resolver 는 null 을 반환하고, 그럼 controller 에서 예외가 발생하게 되나? -> no, controller 에서 해당 resolver 로 가고, tokenService 의 getAuthUser 의 verifyToken 에서 예외 발생!
-
-        return tokenService.getAuthUser(token);                     // 사용: token 을 통해 얻은 AuthUser 객체를 반환한다.
+        return tokenService.getAuthUser(
+                token);                     // 사용: token 을 통해 얻은 AuthUser 객체를 반환한다.
     }
 }

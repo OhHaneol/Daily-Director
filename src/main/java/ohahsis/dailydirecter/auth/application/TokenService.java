@@ -3,6 +3,8 @@ package ohahsis.dailydirecter.auth.application;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import lombok.RequiredArgsConstructor;
 
 import lombok.extern.slf4j.Slf4j;
@@ -16,14 +18,14 @@ import org.springframework.stereotype.Component;
 
 import java.util.Date;
 
-import static ohahsis.dailydirecter.auth.AuthConstants.AUTH_TOKEN_HEADER_KEY;
-
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class TokenService {
+
     private final UserRepository userRepository;
     private String key;
+    private final Set<String> blacklistedTokens = ConcurrentHashMap.newKeySet();
 
     // login api 에 적용
     public String jwtBuilder(Long id, String nickname) {
@@ -45,6 +47,9 @@ public class TokenService {
     }
 
     public void verifyToken(String token) {
+        if (isTokenBlacklisted(token)) {
+            throw new AuthorizationException(ErrorType.TOKEN_BLACKLISTED);
+        }
         // 토큰을 파싱해서 해당 토큰을 얻고, 토큰이 만료되었으면 에러 발생시킴
         try {
             Jwts.parser().setSigningKey(key.getBytes()).parseClaimsJws(token);
@@ -52,7 +57,8 @@ public class TokenService {
             if (e.getMessage().contains("JWT expired")) {   // JWT expired : 토큰 만료 에러 처리
                 throw new AuthorizationException(ErrorType.AUTHORIZATION_ERROR);
             }
-            throw new IllegalArgumentException(ErrorType.NULL_TOKEN.getMessage());  // IllegalArgumentException 은 parseClaimsJws 의 예외 처리
+            throw new IllegalArgumentException(
+                    ErrorType.NULL_TOKEN.getMessage());  // IllegalArgumentException 은 parseClaimsJws 의 예외 처리
         }
 
         // TODO token 을 이용한 로그인의 경우 DB 조회를 줄이는 게 장점인데, 밑에서 userRepository 를 통해 DB 조회가 일어난다. 왜지?
@@ -76,7 +82,8 @@ public class TokenService {
         return new AuthUser(id);
     }
 
-    public Long getUserIdFromToken(String token) {  // TODO 대충 보면 jwt 를 파싱해서 body(??)에 담긴 uid 를 반환하는 것 같은데, jwt 의 payload 를 말하는 건지... 잘 모르겠음.
+    public Long getUserIdFromToken(
+            String token) {  // TODO 대충 보면 jwt 를 파싱해서 body(??)에 담긴 uid 를 반환하는 것 같은데, jwt 의 payload 를 말하는 건지... 잘 모르겠음.
         return Long.valueOf(
                 (Integer)
                         Jwts.parser()
@@ -84,5 +91,25 @@ public class TokenService {
                                 .parseClaimsJws(token)
                                 .getBody()
                                 .get("uid"));
+    }
+
+
+    public void logout(String token) {
+        if (token != null && token.startsWith("Bearer ")) {
+            token = token.substring(7);
+        }
+
+        try {
+            verifyToken(token);
+            blacklistedTokens.add(token);
+            log.info("Token blacklisted: {}", token);
+        } catch (Exception e) {
+            log.error("Error during logout", e);
+            throw new AuthorizationException(ErrorType.AUTHORIZATION_ERROR);
+        }
+    }
+
+    public boolean isTokenBlacklisted(String token) {
+        return blacklistedTokens.contains(token);
     }
 }
