@@ -26,7 +26,7 @@ spring:
 #    database-platform: org.hibernate.dialect.MySQL8InnoDBDialect
 
   thymeleaf:
-    prefix: classpath:/templates/
+    prefix: classpath:/static/
     suffix: .html
 
 
